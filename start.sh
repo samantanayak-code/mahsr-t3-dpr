@@ -1,4 +1,11 @@
 #!/bin/bash
-echo "Starting MAHSR-T3-DPR-App (Streamlit)..."
-source venv/bin/activate
-streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true
+# Render launch script for MAHSR-T3-DPR
+set -e
+echo "🚀 Starting MAHSR-T3-DPR Streamlit service..."
+
+# Clean static and cache
+rm -rf ~/.streamlit/static
+streamlit cache clear || true
+
+# Run the app
+streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.enableXsrfProtection=false
