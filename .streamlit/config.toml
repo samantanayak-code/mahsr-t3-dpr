@@ -13,3 +13,10 @@ primaryColor = "#0095f6"
 secondaryBackgroundColor = "#101820"
 textColor = "#ffffff"
 font = "sans serif"
+# -----------------------------------------------------------------
+# 3. Start Streamlit app
+# -----------------------------------------------------------------
+echo "🌐 Launching MAHSR-T3-DPR app..."
+echo "⏳ Waiting for environment to settle..."
+sleep 3
+streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.enableXsrfProtection=false --server.enableCORS=false
