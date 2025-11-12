@@ -75,3 +75,14 @@ def show_existing_users():
             st.info("No users found in database.")
     except Exception as e:
         st.error(f"Unable to fetch users: {e}")
+from components.admin_add_user import show_add_user_page, show_existing_users
+
+def show_admin_dashboard():
+    st.title("🛠️ Administrator Dashboard")
+    st.write("Welcome, Admin. Manage users and system settings below.")
+
+    tab1, tab2 = st.tabs(["➕ Add User", "📋 View Users"])
+    with tab1:
+        show_add_user_page()
+    with tab2:
+        show_existing_users()
