@@ -18,6 +18,8 @@ from utils.auth import logout_user
 
 load_dotenv()
 
+st.set_option("client.displayEnabled", True)
+st.set_option('browser.gatherUsageStats', False)
 st.set_page_config(
     page_title="MAHSR-T3-DPR-App",
     page_icon="🚄",
