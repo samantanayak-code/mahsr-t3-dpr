@@ -15,6 +15,16 @@ from components.engineer_dashboard import show_engineer_dashboard
 from components.pm_dashboard import show_pm_dashboard
 from components.admin_dashboard import show_admin_dashboard
 from utils.auth import logout_user
+import sys
+
+# Force Streamlit to reload static assets cleanly
+if getattr(sys, 'frozen', False):
+    st.warning("Running as a frozen app — skipping cache reload.")
+else:
+    import shutil
+    static_dir = os.path.join(os.path.expanduser("~"), ".streamlit", "static")
+    if os.path.exists(static_dir):
+        shutil.rmtree(static_dir, ignore_errors=True)
 
 load_dotenv()
 
