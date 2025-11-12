@@ -1,0 +1,298 @@
+MAHSR-T3-DPR-App - Excel Export Testing Guide
+==============================================
+
+This guide provides instructions for testing the Excel export functionality
+to ensure it matches the format of the reference template: 28052025-DPR.xlsx
+
+TESTING PREREQUISITES
+=====================
+
+1. Database Requirements:
+   - At least one daily report saved in the database
+   - Reports should include multiple activities with data
+   - Reports should span across different dates and sites
+
+2. User Requirements:
+   - Login as Project Manager (PM) role
+   - Access to "Reports" tab in PM Dashboard
+
+3. Reference File:
+   - Original template file: 28052025-DPR.xlsx
+   - Keep this file accessible for comparison
+
+TESTING STEPS
+=============
+
+STEP 1: Access Export Functionality
+------------------------------------
+1. Login to the application as Project Manager
+2. Navigate to the "Reports" tab in PM Dashboard
+3. Verify the following controls are visible:
+   - Report Type dropdown
+   - From Date picker
+   - To Date picker
+   - Select Sites multiselect
+   - Export Format radio buttons
+   - Generate Report button
+
+STEP 2: Configure Report Parameters
+------------------------------------
+1. Select Report Type: "Daily Progress Report"
+2. Choose Date Range:
+   - From Date: Select start date
+   - To Date: Select end date (same or later)
+3. Select Sites:
+   - Choose one or more sites from the list
+   - Default: All four sites (TCB-407, TCB-436, TCB-469, TCB-486)
+4. Select Export Format: "Excel (.xlsx)"
+
+STEP 3: Generate and Download Report
+-------------------------------------
+1. Click "Generate Report" button
+2. Wait for spinner to complete (should be < 5 seconds)
+3. Verify success message appears with record count
+4. Click "Download Excel Report" button
+5. Save the downloaded file (format: DDMMYYYY-DPR.xlsx)
+
+STEP 4: Validate Excel Structure
+---------------------------------
+
+Open the downloaded Excel file and verify:
+
+HEADER SECTION:
+[ ] Row 1: "MAHSR-T3 Daily Progress Report" (merged, blue background)
+[ ] Row 2: Period information showing date range
+[ ] Row 3-4: Column headers with proper structure:
+    - S.No (merged rows 3-4)
+    - SCOPE / ACTIVITY (merged rows 3-4)
+    - Unit (merged rows 3-4)
+    - For each site (merged columns in row 3):
+      - Target (row 4)
+      - Achieved (row 4)
+      - Cumulative (row 4)
+
+ACTIVITY ROWS (Starting Row 5):
+[ ] 10 activity rows present:
+    1. Segment Casting (Nos)
+    2. Segment Demolding (Nos)
+    3. Segment Curing (Nos)
+    4. Segment Transportation (Nos)
+    5. Quality Inspection (Nos)
+    6. Reinforcement Work (Kg)
+    7. Concrete Work (Cu.m)
+    8. Formwork Installation (Sq.m)
+    9. Formwork Removal (Sq.m)
+    10. Steel Fixing (MT)
+
+[ ] Each activity row contains:
+    - Sequential S.No (1-10)
+    - Activity name (left-aligned)
+    - Unit (center-aligned)
+    - For each selected site:
+      - Target value (numeric, 2 decimal places)
+      - Achieved value (numeric, 2 decimal places)
+      - Cumulative value (numeric, 2 decimal places)
+
+TOTAL ROW:
+[ ] Total row present after activities
+[ ] "TOTAL" label in SCOPE/ACTIVITY column
+[ ] Sum of all numeric values for each site column
+[ ] Correct calculations verified
+
+REMARKS SECTION:
+[ ] "REMARKS & WEATHER CONDITIONS" header (merged)
+[ ] One row per site with:
+    - Site code
+    - Weather information
+    - Total workers count
+    - General remarks
+
+STEP 5: Compare with Template
+------------------------------
+
+Side-by-side comparison with 28052025-DPR.xlsx:
+
+COLUMN STRUCTURE:
+[ ] Column widths match template
+[ ] Column headers exactly match template
+[ ] Grouped columns for each site match template
+
+FORMATTING:
+[ ] Header background colors match (blue: #4472C4)
+[ ] Subheader background colors match (light blue: #B4C7E7)
+[ ] Data cells have borders
+[ ] Number format: 2 decimal places
+[ ] Text alignment: Headers centered, activities left-aligned
+[ ] Font and font sizes consistent with template
+
+DATA LAYOUT:
+[ ] Activity names and order match template exactly
+[ ] Units match template exactly
+[ ] Target, Achieved, Cumulative columns in correct order
+[ ] Total row calculations correct
+[ ] Remarks section format matches template
+
+STEP 6: Test Edge Cases
+------------------------
+
+Test 1: Single Site Export
+[ ] Select only one site
+[ ] Generate report
+[ ] Verify only selected site columns appear
+[ ] Verify no empty/extra columns
+
+Test 2: Date Range with No Data
+[ ] Select date range with no reports
+[ ] Generate report
+[ ] Verify file generates with zero values
+[ ] Verify structure remains intact
+
+Test 3: Single Day Report
+[ ] Set From Date = To Date
+[ ] Generate report
+[ ] Verify data for single day appears correctly
+
+Test 4: Multiple Sites, Multiple Days
+[ ] Select all sites
+[ ] Select date range spanning multiple days
+[ ] Generate report
+[ ] Verify cumulative values are correctly calculated
+[ ] Verify achieved values are summed across days
+
+Test 5: Long Date Range
+[ ] Select date range spanning 30+ days
+[ ] Generate report
+[ ] Verify performance (< 10 seconds)
+[ ] Verify data accuracy
+
+STEP 7: Data Accuracy Validation
+---------------------------------
+
+For at least one site and date:
+
+1. Manually check database values:
+   - Open database and query daily_reports table
+   - Query report_activities for specific report_id
+   - Note down target, achieved, cumulative values
+
+2. Compare with Excel export:
+   - Locate corresponding activity in Excel
+   - Verify Target matches database
+   - Verify Achieved matches database
+   - Verify Cumulative matches database
+
+3. Verify calculations:
+   - Sum Target values manually
+   - Compare with TOTAL row in Excel
+   - Verify all sites and activities
+
+STEP 8: File Naming Convention
+-------------------------------
+
+[ ] File name format: DDMMYYYY-DPR.xlsx
+[ ] Date in filename matches "From Date" selected
+[ ] File extension is .xlsx (not .xls)
+[ ] File can be opened in Microsoft Excel
+[ ] File can be opened in Google Sheets
+[ ] File can be opened in LibreOffice Calc
+
+STEP 9: Multi-User Scenario
+----------------------------
+
+[ ] PM User A generates report
+[ ] PM User B generates report simultaneously
+[ ] Both reports download successfully
+[ ] Both reports contain correct data
+[ ] No data conflicts or corruption
+
+STEP 10: Error Handling
+------------------------
+
+Test error scenarios:
+
+[ ] No sites selected → Error message displayed
+[ ] Start date > End date → Error message displayed
+[ ] Database connection failure → Graceful error message
+[ ] No data in date range → Empty report with structure
+[ ] Invalid date selection → Validation message
+
+COMPARISON CHECKLIST
+====================
+
+Use this checklist to verify exact match with template:
+
+STRUCTURAL ELEMENTS:
+[ ] Same number of columns
+[ ] Same number of header rows
+[ ] Same activity count (10)
+[ ] Same total row position
+[ ] Same remarks section structure
+
+VISUAL ELEMENTS:
+[ ] Colors match exactly
+[ ] Borders match exactly
+[ ] Cell merging matches exactly
+[ ] Font styles match
+[ ] Number formats match
+
+CONTENT ELEMENTS:
+[ ] Activity names identical
+[ ] Units identical
+[ ] Column headers identical
+[ ] Section labels identical
+
+DATA ELEMENTS:
+[ ] Target values accurate
+[ ] Achieved values accurate
+[ ] Cumulative values accurate
+[ ] Totals calculated correctly
+[ ] Remarks transferred correctly
+
+ISSUES LOG
+==========
+
+Record any discrepancies found:
+
+Issue #1:
+Description: _________________________________________________
+Expected: ___________________________________________________
+Actual: _____________________________________________________
+Severity: [ ] Critical  [ ] High  [ ] Medium  [ ] Low
+Status: [ ] Open  [ ] Fixed  [ ] Won't Fix
+
+Issue #2:
+Description: _________________________________________________
+Expected: ___________________________________________________
+Actual: _____________________________________________________
+Severity: [ ] Critical  [ ] High  [ ] Medium  [ ] Low
+Status: [ ] Open  [ ] Fixed  [ ] Won't Fix
+
+PERFORMANCE METRICS
+===================
+
+Record performance data:
+
+Date Range: _____ to _____
+Number of Sites: _____
+Number of Reports: _____
+Generation Time: _____ seconds
+File Size: _____ KB
+
+SIGN-OFF
+========
+
+Tester Name: _________________
+Date: _______________________
+Status: [ ] Passed  [ ] Failed  [ ] Passed with Issues
+
+Approved By: _________________
+Date: _______________________
+
+NOTES
+=====
+
+Additional observations:
+_____________________________________________________________
+_____________________________________________________________
+_____________________________________________________________
+_____________________________________________________________

@@ -1,0 +1,597 @@
+MAHSR-T3-DPR-App - Automated Email Service Guide
+=================================================
+
+OVERVIEW
+========
+
+The Automated Email Service sends daily DPR reports to Project Managers
+at 10:30 AM IST every day. Reports are sent as Excel attachments via
+Gmail SMTP using a free Gmail account.
+
+KEY FEATURES
+============
+
+1. SCHEDULED SENDING
+   - Automatic dispatch at 10:30 AM IST
+   - Previous day's consolidated report
+   - All sites included in single Excel file
+
+2. RECIPIENT MANAGEMENT
+   - Add/remove recipients via Admin Dashboard
+   - Active/inactive status control
+   - Multiple report types (daily, weekly, monthly)
+   - Role-based organization
+
+3. EMAIL TEMPLATES
+   - Professional HTML formatting
+   - Report summary in email body
+   - Excel attachment matching DPR format
+   - Branded with MAHSR-T3 identity
+
+4. DELIVERY TRACKING
+   - Email logs in database
+   - Success/failure status
+   - Error message logging
+   - Audit trail for compliance
+
+5. MANUAL SENDING
+   - Send reports on-demand from Admin Dashboard
+   - Test email functionality
+   - Specific date selection
+
+IMPLEMENTATION FILES
+====================
+
+1. supabase/migrations/20251107073319_create_email_recipients_table.sql
+   - Creates email_recipients table
+   - Creates email_logs table
+   - Sets up RLS policies
+   - Indexes for performance
+
+2. utils/email_service.py
+   - SMTP configuration
+   - Email sending logic
+   - HTML template generation
+   - Recipient management functions
+   - Logging functionality
+
+3. components/admin_dashboard.py (Enhanced)
+   - New "Email Setup" tab
+   - Recipient management UI
+   - Test email functionality
+   - Email logs viewer
+
+4. requirements.txt (Updated)
+   - Added pytz==2023.3 for timezone handling
+
+DATABASE SCHEMA
+===============
+
+Table: email_recipients
+-----------------------
+- id (uuid): Unique identifier
+- email (text): Email address (unique)
+- name (text): Recipient name
+- role (text): Role (PM, Admin, etc.)
+- active (boolean): Whether recipient receives emails
+- report_types (text[]): Array of report types ['daily', 'weekly', 'monthly']
+- created_at (timestamptz): Creation timestamp
+- updated_at (timestamptz): Last update timestamp
+
+Table: email_logs
+-----------------
+- id (uuid): Unique identifier
+- recipient_email (text): Email sent to
+- subject (text): Email subject line
+- report_date (date): Date of the report
+- attachment_name (text): Filename of attachment
+- status (text): 'sent', 'failed', 'pending'
+- error_message (text): Error details if failed
+- sent_at (timestamptz): When email was sent
+
+SMTP CONFIGURATION
+==================
+
+Required Environment Variables (.env file):
+
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+SENDER_EMAIL=your-email@gmail.com
+SENDER_NAME=MAHSR-T3 DPR System
+
+GMAIL SETUP INSTRUCTIONS
+=========================
+
+Step 1: Enable 2-Factor Authentication
+---------------------------------------
+1. Go to myaccount.google.com
+2. Click "Security" in left menu
+3. Under "Signing in to Google", click "2-Step Verification"
+4. Follow prompts to enable 2FA
+
+Step 2: Generate App Password
+------------------------------
+1. Go to myaccount.google.com/apppasswords
+2. Select "Mail" as the app
+3. Select "Other" as the device
+4. Name it: "MAHSR-T3 DPR System"
+5. Click "Generate"
+6. Copy the 16-character password (no spaces)
+7. This is your SMTP_PASSWORD
+
+Step 3: Update .env File
+-------------------------
+1. Open .env file in project root
+2. Add/update the following:
+
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-gmail-address@gmail.com
+SMTP_PASSWORD=abcd efgh ijkl mnop  # Your 16-char app password (remove spaces)
+SENDER_EMAIL=your-gmail-address@gmail.com
+SENDER_NAME=MAHSR-T3 DPR System
+
+3. Save the file
+4. Restart the application
+
+IMPORTANT NOTES:
+- Use App Password, NOT your regular Gmail password
+- App Password is 16 characters without spaces
+- Keep .env file secure (never commit to git)
+- Use a dedicated Gmail account for sending (not personal)
+
+MANAGING RECIPIENTS
+===================
+
+Via Admin Dashboard:
+--------------------
+
+1. Login as Administrator
+2. Go to "Email Setup" tab
+3. View current recipients in list
+4. Add new recipient:
+   - Enter email address
+   - Enter full name
+   - Select role (PM, Admin, Other)
+   - Check "Active" if should receive emails
+   - Select report types (daily, weekly, monthly)
+   - Click "Add Recipient"
+
+Directly in Database:
+---------------------
+
+Using Supabase Dashboard or SQL:
+
+INSERT INTO email_recipients (email, name, role, active, report_types)
+VALUES
+  ('pm1@company.com', 'Project Manager 1', 'PM', true, ARRAY['daily']),
+  ('pm2@company.com', 'Project Manager 2', 'PM', true, ARRAY['daily', 'weekly']);
+
+Update Recipient:
+
+UPDATE email_recipients
+SET active = false
+WHERE email = 'pm1@company.com';
+
+Delete Recipient:
+
+DELETE FROM email_recipients
+WHERE email = 'old-email@company.com';
+
+RECIPIENT ACTIVATION/DEACTIVATION
+==================================
+
+To Temporarily Stop Emails to a Recipient:
+1. Go to Admin Dashboard → Email Setup
+2. Find recipient in list
+3. Update active status to false in database
+4. They will no longer receive emails
+
+To Reactivate:
+1. Update active status back to true
+2. Emails will resume
+
+Note: Keep recipients in database rather than deleting for audit purposes.
+
+TESTING EMAIL FUNCTIONALITY
+============================
+
+Test Email (No Attachment):
+---------------------------
+1. Go to Admin Dashboard → Email Setup
+2. Enter your email in "Test Email Address"
+3. Click "Send Test Email"
+4. Check inbox for test message
+5. If received, SMTP is configured correctly
+
+Manual Report Send:
+-------------------
+1. Go to Admin Dashboard → Email Setup
+2. Select date from "Manual Send Date"
+3. Click "Send Manual Report"
+4. Check status message
+5. Verify recipients received email with attachment
+
+Troubleshooting Test Failures:
+-------------------------------
+- "SMTP authentication failed": Check username/password
+- "Connection refused": Check SMTP server/port
+- "Missing configuration": Add env vars to .env
+- No email received: Check spam folder
+- Gmail blocked: Enable "Less secure app access" or use App Password
+
+EMAIL CONTENT
+=============
+
+Email Subject:
+MAHSR-T3 Daily Progress Report - DD-MM-YYYY
+
+Email Body (HTML):
+- Header with project branding
+- Report summary table:
+  * Report Date
+  * Sites Covered
+  * Total Reports
+  * Generated At timestamp
+- Attachment information
+- Professional signature
+- Footer with copyright
+
+Attachment:
+- Excel file: DDMMYYYY-DPR.xlsx
+- Format matches standard DPR template
+- Includes all sites
+- All activities with data
+
+AUTOMATED SCHEDULING
+====================
+
+The system checks if it's 10:30 AM IST (±5 minutes) and sends reports.
+
+For Production Deployment:
+
+Option 1: Cron Job (Linux/Mac)
+-------------------------------
+Add to crontab:
+
+30 10 * * * cd /path/to/project && python3 send_daily_reports.py
+
+Create send_daily_reports.py:
+
+```python
+import os
+from datetime import date, timedelta
+from dotenv import load_dotenv
+from supabase import create_client
+from utils.email_service import send_daily_report_to_all
+
+load_dotenv()
+
+supabase = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+)
+
+yesterday = date.today() - timedelta(days=1)
+sites = ["TCB-407", "TCB-436", "TCB-469", "TCB-486"]
+
+result = send_daily_report_to_all(supabase, yesterday, sites)
+print(f"Email send result: {result}")
+```
+
+Option 2: GitHub Actions
+-------------------------
+Create .github/workflows/daily-report.yml:
+
+```yaml
+name: Daily Report Email
+
+on:
+  schedule:
+    - cron: '0 5 * * *'  # 10:30 AM IST = 5:00 AM UTC
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - run: pip install -r requirements.txt
+      - run: python send_daily_reports.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+```
+
+Option 3: Cloud Functions (Supabase/AWS Lambda)
+-----------------------------------------------
+Deploy scheduled function that runs daily at 10:30 AM IST.
+
+Option 4: Heroku Scheduler
+---------------------------
+Add-on: Heroku Scheduler
+Command: python send_daily_reports.py
+Frequency: Daily at 10:30 AM IST
+
+MONITORING & LOGS
+=================
+
+View Email Logs:
+----------------
+1. Admin Dashboard → Email Setup
+2. Scroll to "Email Logs (Recent)"
+3. View last 10 sent emails with status
+
+Log Information:
+- Report Date
+- Recipient Email
+- Subject (truncated)
+- Status (✓ Sent / ✗ Failed)
+- Timestamp
+
+Database Query for Full Logs:
+
+SELECT * FROM email_logs
+ORDER BY sent_at DESC
+LIMIT 100;
+
+Check Failed Emails:
+
+SELECT * FROM email_logs
+WHERE status = 'failed'
+ORDER BY sent_at DESC;
+
+TROUBLESHOOTING
+===============
+
+Issue: Emails not sending automatically
+Solution:
+- Verify cron job is running
+- Check system clock is IST or correct timezone
+- Verify SMTP credentials in .env
+- Check email logs for error messages
+- Ensure recipients are marked "active"
+
+Issue: "SMTP Authentication Error"
+Solution:
+- Generate new App Password from Google
+- Update SMTP_PASSWORD in .env
+- Ensure 2FA is enabled on Gmail account
+- Use App Password, not regular password
+
+Issue: Recipients not receiving emails
+Solution:
+- Check spam/junk folders
+- Verify email addresses are correct
+- Ensure recipients are marked "active"
+- Check email logs for delivery status
+- Test with known working email address
+
+Issue: "No active recipients found"
+Solution:
+- Add recipients via Admin Dashboard
+- Ensure at least one recipient is active
+- Verify report_types includes 'daily'
+- Check database for recipient records
+
+Issue: Attachment missing or corrupted
+Solution:
+- Verify reports exist in database for date
+- Check Excel generation logic
+- Test manual send to confirm attachment
+- Ensure sufficient disk space
+
+Issue: Wrong time zone
+Solution:
+- System uses IST (Asia/Kolkata) timezone
+- Verify server timezone settings
+- Adjust cron schedule if needed
+- Check pytz installation
+
+GMAIL FREE TIER LIMITS
+=======================
+
+Daily Sending Limits:
+- 500 emails per day (free Gmail)
+- 2000 emails per day (Google Workspace)
+
+Recommendations:
+- Keep recipient list under 100 for safety margin
+- Use dedicated account for DPR system
+- Monitor daily usage
+- Consider Google Workspace for larger teams
+
+If Limits Exceeded:
+- Emails will be rejected by Gmail
+- Error logged in database
+- Wait 24 hours for limit reset
+- Consider upgrading to Google Workspace
+- Split recipients across multiple accounts
+
+BEST PRACTICES
+==============
+
+For Administrators:
+
+1. Regular Review:
+   - Check email logs weekly
+   - Remove inactive recipients
+   - Monitor failed sends
+   - Keep recipient list updated
+
+2. Security:
+   - Use dedicated Gmail account
+   - Enable 2FA on sending account
+   - Use App Passwords (not regular password)
+   - Keep .env file secure
+   - Rotate App Password every 90 days
+
+3. Maintenance:
+   - Test email monthly
+   - Verify cron job status
+   - Check disk space
+   - Monitor Gmail quota usage
+   - Update recipient list as needed
+
+4. Recipient Management:
+   - Confirm email addresses before adding
+   - Use descriptive names
+   - Set appropriate report types
+   - Deactivate rather than delete
+   - Maintain contact information
+
+MANUAL OPERATIONS
+=================
+
+Send Yesterday's Report:
+1. Admin Dashboard → Email Setup
+2. Manual Send Date: Yesterday
+3. Click "Send Manual Report"
+4. Verify success
+
+Send Specific Date Report:
+1. Admin Dashboard → Email Setup
+2. Manual Send Date: Select date
+3. Click "Send Manual Report"
+4. Check email logs
+
+Resend Failed Emails:
+1. Check email logs for failures
+2. Fix issue (email address, SMTP, etc.)
+3. Use Manual Send with same date
+4. Verify delivery
+
+INTEGRATION WITH DPR SYSTEM
+============================
+
+Data Flow:
+1. Engineers submit daily reports
+2. Reports stored in database
+3. At 10:30 AM IST, scheduler triggers
+4. System fetches active recipients
+5. Excel report generated from database
+6. Emails sent with attachment
+7. Results logged to database
+
+Report Content:
+- Previous day's data (T-1)
+- All four TCB sites
+- All 10 activities
+- Consolidated in single Excel file
+- Format matches manual download
+
+Consistency:
+- Email report = Manual download from PM Dashboard
+- Same Excel format
+- Same data source (database)
+- Same generation logic
+
+SECURITY CONSIDERATIONS
+=======================
+
+Email Security:
+- Use TLS encryption (port 587)
+- App Passwords instead of regular passwords
+- Dedicated sending account
+- No sensitive data in email body
+- Attachments are password-protected Excel (future)
+
+Access Control:
+- Only Admin can manage recipients
+- RLS policies on database tables
+- Service role for automated sending
+- Email logs require authentication
+
+Data Privacy:
+- No personal data in email body
+- Reports contain work data only
+- Recipients limited to project team
+- Audit trail in email logs
+
+Compliance:
+- Email logs for audit
+- Recipient consent implied (business use)
+- Data retention per company policy
+- GDPR/compliance considerations
+
+FUTURE ENHANCEMENTS
+===================
+
+Planned Features:
+- PDF attachments (in addition to Excel)
+- Weekly/Monthly summary emails
+- Customizable email templates
+- Email scheduling UI
+- Recipient groups
+- Email delivery reports
+- Bounce handling
+- Unsubscribe functionality
+- HTML report in email body
+- Multiple attachment support
+- Email notifications for critical issues
+
+SUPPORT & TROUBLESHOOTING
+==========================
+
+Common Issues:
+
+1. Test email works but automated doesn't
+   → Check cron job is running
+   → Verify timezone settings
+
+2. Some recipients receive, others don't
+   → Check spam folders
+   → Verify email addresses
+   → Check daily limits
+
+3. Attachment not opening
+   → Verify Excel format
+   → Check file size
+   → Try different email client
+
+4. Duplicate emails sent
+   → Check cron job not running multiple times
+   → Review email logs for duplicates
+   → Verify schedule configuration
+
+For Technical Support:
+1. Check EMAIL_SERVICE_GUIDE.txt
+2. Review email_logs table in database
+3. Test SMTP configuration
+4. Verify .env file settings
+5. Check application logs
+
+SUMMARY
+=======
+
+The Email Service automates daily DPR distribution to Project Managers,
+sending professionally formatted Excel reports at 10:30 AM IST using
+Gmail SMTP. Recipients are managed through the Admin Dashboard with
+full logging and monitoring capabilities.
+
+Quick Start:
+1. Configure Gmail App Password
+2. Update .env file with SMTP credentials
+3. Add recipients via Admin Dashboard
+4. Test email functionality
+5. Deploy cron job for automation
+
+Key Benefits:
+✓ Automated daily distribution
+✓ Professional HTML emails
+✓ Excel attachments matching DPR format
+✓ Easy recipient management
+✓ Comprehensive logging
+✓ Free Gmail SMTP
+✓ No additional costs
+
+=======================================================
+Document Version: 1.0
+Last Updated: November 7, 2025
+For: MAHSR-T3-DPR-App Administrators
+=======================================================

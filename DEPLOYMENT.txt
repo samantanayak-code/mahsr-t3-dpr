@@ -1,0 +1,34 @@
+MAHSR-T3-DPR-App - Streamlit Cloud Deployment Instructions
+=============================================================
+
+QUICK DEPLOYMENT GUIDE:
+-----------------------
+
+1. PREPARE YOUR REPOSITORY
+   - Push your code to GitHub (create a new repository if needed)
+   - Ensure all files are committed: app.py, requirements.txt, folders, .streamlit/config.toml
+   - DO NOT commit .env file (it's already in .gitignore)
+
+2. DEPLOY TO STREAMLIT CLOUD
+   - Visit: https://share.streamlit.io/
+   - Sign in with your GitHub account
+   - Click "New app"
+   - Select your repository, branch (usually "main"), and set main file to "app.py"
+   - Click "Deploy"
+
+3. CONFIGURE SECRETS (IMPORTANT!)
+   - In Streamlit Cloud dashboard, go to your app settings
+   - Click "Secrets" in the left sidebar
+   - Add your Supabase credentials in TOML format:
+
+     SUPABASE_URL = "https://0ec90b57d6e95fcbda19832f.supabase.co"
+     SUPABASE_ANON_KEY = "your_anon_key_here"
+
+   - Save secrets
+
+4. APP IS LIVE!
+   - Your app will be available at: https://[your-app-name].streamlit.app
+   - Updates to your GitHub repo will auto-redeploy the app
+
+
+THAT'S IT! Your MAHSR-T3-DPR-App is now accessible to your team from anywhere with just a web browser.

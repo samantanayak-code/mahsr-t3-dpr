@@ -1,0 +1,202 @@
+MAHSR-T3-DPR-App - Data Entry Form Testing Checklist
+======================================================
+
+This checklist ensures all data fields are working correctly and all validation rules are properly implemented.
+
+SECTION 1: FORM DISPLAY & LAYOUT
+=================================
+
+[ ] Login as Site Engineer and access Data Entry tab
+[ ] Verify form displays in two-column layout for activities
+[ ] Check form is mobile-friendly and responsive
+[ ] Confirm all labels and help text are visible
+[ ] Verify all 10 activities are displayed:
+    [ ] Segment Casting (Nos)
+    [ ] Segment Demolding (Nos)
+    [ ] Segment Curing (Nos)
+    [ ] Segment Transportation (Nos)
+    [ ] Quality Inspection (Nos)
+    [ ] Reinforcement Work (Kg)
+    [ ] Concrete Work (Cu.m)
+    [ ] Formwork Installation (Sq.m)
+    [ ] Formwork Removal (Sq.m)
+    [ ] Steel Fixing (MT)
+
+SECTION 2: GENERAL INFORMATION FIELDS
+======================================
+
+[ ] Report Date picker works correctly
+[ ] Report Date defaults to today
+[ ] Report Date cannot be set to future dates
+[ ] Site Code is auto-filled from logged-in user
+[ ] Weather dropdown contains all options:
+    [ ] Clear
+    [ ] Cloudy
+    [ ] Light Rain
+    [ ] Heavy Rain
+    [ ] Hot
+    [ ] Moderate
+[ ] Total Workers field accepts numeric input (0-500)
+[ ] Total Workers cannot be negative
+
+SECTION 3: ACTIVITY DATA ENTRY
+===============================
+
+For EACH of the 10 activities, verify:
+
+[ ] Target field accepts decimal numbers (0.0 - 10000.0)
+[ ] Achieved field accepts decimal numbers (0.0 - 10000.0)
+[ ] Cumulative field accepts decimal numbers (0.0 - 100000.0)
+[ ] Activity-specific remarks field accepts text input
+[ ] All fields have appropriate help text tooltips
+[ ] Fields display correct units in labels
+
+SECTION 4: VALIDATION RULES
+============================
+
+Test the following validation scenarios:
+
+[ ] Empty form submission shows error: "At least one activity must have data"
+[ ] Achieved > Target shows error for that activity
+[ ] Negative values in any numeric field show error
+[ ] Future date selection shows error
+[ ] Missing weather selection shows error
+[ ] All validation errors display clearly in red
+
+SECTION 5: SUMMARY SECTION
+===========================
+
+[ ] "Activities with Progress" counts only activities with achieved > 0
+[ ] "Total Target" sums all target values correctly
+[ ] "Total Achieved" sums all achieved values correctly
+[ ] Progress bar displays when Total Target > 0
+[ ] Progress percentage calculates correctly: (Total Achieved / Total Target) * 100
+[ ] Progress bar caps at 100% even if achieved exceeds target
+
+SECTION 6: FORM SUBMISSION
+===========================
+
+[ ] "Save Report" button is visible and clickable
+[ ] Clicking Save with valid data shows success message
+[ ] Success message includes checkmark and "Report saved successfully"
+[ ] Balloons animation plays on successful save
+[ ] Form reloads/refreshes after successful save
+[ ] Duplicate date/site report shows warning message
+[ ] Existing report can be updated
+[ ] "Reset Form" button clears all inputs
+
+SECTION 7: DATA PERSISTENCE (Database)
+=======================================
+
+[ ] New report creates entry in daily_reports table
+[ ] Report data includes: date, site_code, engineer_id, weather, workers, remarks
+[ ] Activities with data (target/achieved/cumulative > 0) saved to report_activities table
+[ ] Activities with all zeros are NOT saved to database
+[ ] Each activity record includes: activity_name, unit, target, achieved, cumulative, remarks
+[ ] Updating existing report preserves report_id
+[ ] Old activities are deleted and replaced on update
+[ ] Database timestamps (created_at, updated_at) are set correctly
+
+SECTION 8: ERROR HANDLING
+==========================
+
+[ ] Database connection failure shows appropriate error
+[ ] Network errors during save display user-friendly message
+[ ] Invalid data types are caught before submission
+[ ] Form doesn't crash on unexpected input
+[ ] All error messages are clear and actionable
+
+SECTION 9: USER EXPERIENCE
+===========================
+
+[ ] Form loads quickly (< 2 seconds)
+[ ] Input fields respond immediately to user input
+[ ] No lag when switching between fields
+[ ] Summary updates in real-time as user enters data
+[ ] Form works on mobile devices (test on phone/tablet)
+[ ] All text is readable on small screens
+[ ] Touch targets are large enough for mobile use
+
+SECTION 10: DATA ACCURACY
+==========================
+
+Test with sample data to verify calculations:
+
+Test Case 1: Single Activity
+[ ] Enter: Segment Casting - Target: 10, Achieved: 8
+[ ] Verify: Summary shows 1 activity, Target: 10, Achieved: 8, Progress: 80%
+
+Test Case 2: Multiple Activities
+[ ] Enter: 3 activities with different values
+[ ] Verify: Summary correctly sums all values
+[ ] Verify: Progress percentage is correct
+
+Test Case 3: Exceeded Target
+[ ] Enter: Target: 10, Achieved: 12
+[ ] Verify: Validation error appears
+[ ] Verify: Form does not submit
+
+Test Case 4: Zero Values
+[ ] Leave all activities at 0 except one
+[ ] Verify: Only non-zero activity is saved to database
+[ ] Verify: Summary shows correct count (1 activity)
+
+Test Case 5: Decimal Values
+[ ] Enter: Concrete Work - Target: 12.5, Achieved: 10.75
+[ ] Verify: Values are saved correctly with decimal precision
+[ ] Verify: Summary calculations are accurate
+
+SECTION 11: CROSS-BROWSER TESTING
+==================================
+
+Test the form on:
+[ ] Chrome/Edge (Desktop)
+[ ] Firefox (Desktop)
+[ ] Safari (Desktop/Mac)
+[ ] Chrome (Mobile/Android)
+[ ] Safari (Mobile/iOS)
+
+SECTION 12: INTEGRATION TESTING
+================================
+
+[ ] Engineer can logout and login again
+[ ] Saved reports appear in "My Reports" tab (when implemented)
+[ ] PM can view engineer's submitted reports (when implemented)
+[ ] Admin can see all reports from all sites (when implemented)
+
+SECTION 13: EDGE CASES
+=======================
+
+[ ] Submitting report at exactly midnight
+[ ] Very long text in remarks fields (1000+ characters)
+[ ] Special characters in remarks (quotes, apostrophes, etc.)
+[ ] Maximum allowed workers (500)
+[ ] Maximum allowed values in all numeric fields
+[ ] Report for same date/site created by different engineer
+[ ] Network interruption during save
+[ ] Browser refresh with unsaved data
+
+NOTES SECTION
+=============
+
+Record any issues found:
+_____________________________________________________________
+_____________________________________________________________
+_____________________________________________________________
+_____________________________________________________________
+
+EXCEL FORMAT ALIGNMENT
+======================
+
+Once "28052025-DPR.xlsx" is available, verify:
+
+[ ] All activities match Excel exactly (names and order)
+[ ] All units match Excel format
+[ ] Field structure matches Excel columns
+[ ] Weather options match Excel dropdown values
+[ ] Generated report output matches Excel layout
+
+=============================================================
+Tester Name: _________________  Date: ___________________
+Completion Status: [ ] All Passed  [ ] Issues Found
+=============================================================

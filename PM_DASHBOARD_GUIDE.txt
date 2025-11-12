@@ -1,0 +1,455 @@
+MAHSR-T3-DPR-App - Project Manager Dashboard Guide
+===================================================
+
+OVERVIEW
+========
+
+The PM Dashboard provides comprehensive real-time analytics and reporting
+for all TCB sites (407, 436, 469, 486) with daily, monthly, and cumulative
+progress tracking.
+
+KEY FEATURES
+============
+
+1. REAL-TIME METRICS
+   - Total sites and active reports
+   - Reports submitted today
+   - Overall progress percentage with color-coded status
+   - Target vs Achieved tracking
+
+2. COLOR-CODED STATUS SYSTEM
+   🟢 Excellent: Progress ≥90%
+   🟡 On Track: Progress 70-89%
+   🟠 Needs Attention: Progress 50-69%
+   🔴 Critical: Progress <50%
+
+3. INTERACTIVE FILTERS
+   - Period selection (Today, Last 7 Days, Last 30 Days, This Month, Custom)
+   - Site filtering (select specific sites or all)
+   - Activity filtering (focus on specific activities)
+
+4. COMPREHENSIVE CHARTS
+   - Daily progress trend (line chart)
+   - Cumulative progress by activity (bar chart)
+   - Site performance comparison (bar chart)
+   - Activity-wise analysis (bar charts)
+
+5. EXCEL EXPORT
+   - Download DPR reports matching 28052025-DPR.xlsx format
+   - Multi-site selection
+   - Date range filtering
+
+DASHBOARD SECTIONS
+==================
+
+OVERVIEW TAB (📊)
+-----------------
+
+Purpose: Real-time monitoring and analytics
+
+Top Metrics:
+- Total Sites: Number of active sites
+- Reports Today: Reports submitted today
+- Overall Progress: Aggregate progress with color status
+- Total Reports: All-time report count
+
+Sub-tabs:
+
+1. Summary Charts
+   - Daily Progress Trend: Line chart showing target vs achieved over time
+   - Period Target/Achieved: Summary metrics for selected period
+   - Cumulative Progress: Bar chart of cumulative values per activity
+
+2. Site-wise Analysis
+   - Filter by specific sites
+   - Expandable cards for each site showing:
+     * Target, Achieved, Cumulative values
+     * Progress percentage
+     * Last report date
+     * Report count
+     * Progress bar visualization
+   - Site Comparison Table: All sites in tabular format
+   - Site Performance Chart: Visual comparison
+
+3. Activity-wise Analysis
+   - Filter by specific activities
+   - Table with all activities showing:
+     * Activity name and unit
+     * Target, Achieved, Cumulative
+     * Progress bar
+   - Activity Performance Chart: Target vs Achieved
+   - Cumulative Progress Chart: Total cumulative by activity
+
+REPORTS TAB (📋)
+----------------
+
+Purpose: Generate and download reports
+
+Features:
+
+1. Daily Progress Report
+   - Select date range
+   - Select sites
+   - Download Excel (.xlsx) format
+   - Matches 28052025-DPR.xlsx template exactly
+
+2. Monthly Summary
+   - Select year and month
+   - Displays:
+     * Working days
+     * Total target and achieved
+     * Progress percentage
+     * Total reports
+     * Average workers per day
+
+MANAGEMENT TAB (⚙️)
+-------------------
+
+Purpose: Configuration and instructions
+
+Contains:
+- Site information and names
+- Detailed dashboard instructions
+- Usage guide with examples
+- Best practices for PM users
+- Color-coded status guide
+
+USING THE DASHBOARD
+===================
+
+DAILY MONITORING WORKFLOW
+--------------------------
+
+1. Login as Project Manager
+2. Navigate to Overview tab
+3. Check top metrics for overall status
+4. Review color-coded progress indicator
+5. If red/orange status:
+   - Go to Site-wise Analysis
+   - Identify underperforming sites
+   - Review specific metrics
+   - Take corrective action
+
+WEEKLY REVIEW WORKFLOW
+-----------------------
+
+1. Set period to "Last 7 Days"
+2. Review Daily Progress Trend chart
+3. Check Site-wise Analysis for all sites
+4. Identify trends (improving or declining)
+5. Generate weekly report:
+   - Go to Reports tab
+   - Set date range (7 days)
+   - Select all sites
+   - Download Excel report
+6. Share with management
+
+MONTHLY REPORTING WORKFLOW
+---------------------------
+
+1. Navigate to Reports tab
+2. Use Monthly Summary section
+3. Select current/previous month
+4. Review metrics:
+   - Working days
+   - Total progress
+   - Worker statistics
+5. Generate monthly DPR:
+   - Set date range (month start to end)
+   - Select all sites
+   - Download Excel report
+6. Archive and distribute
+
+FILTERING BEST PRACTICES
+=========================
+
+Site Filtering:
+- Use when focusing on specific problem areas
+- Compare similar sites (e.g., TCB-407 vs TCB-436)
+- Track site-specific progress over time
+
+Activity Filtering:
+- Focus on critical path activities
+- Monitor resource-intensive tasks (Concrete Work, Steel Fixing)
+- Track quality activities (Quality Inspection)
+- Identify activity bottlenecks
+
+Period Selection:
+- Today: Quick daily check
+- Last 7 Days: Weekly trends
+- Last 30 Days: Monthly patterns
+- This Month: Current month progress
+- Custom Range: Specific analysis periods
+
+DATA INTERPRETATION
+===================
+
+UNDERSTANDING METRICS
+---------------------
+
+Target:
+- Sum of all planned/target values for period
+- Represents what should be achieved
+
+Achieved:
+- Sum of actual completed work for period
+- Represents what was achieved
+
+Cumulative:
+- Running total up to selected date
+- Shows overall progress from project start
+- Represents maximum cumulative value
+
+Progress %:
+- (Achieved / Target) × 100
+- Indicates efficiency and performance
+- Used for color-coded status
+
+READING CHARTS
+--------------
+
+Daily Progress Trend (Line Chart):
+- X-axis: Dates
+- Y-axis: Quantity values
+- Blue line: Target
+- Red/Orange line: Achieved
+- Gap between lines = performance gap
+- Parallel lines = on track
+- Diverging lines = falling behind
+
+Cumulative Progress (Bar Chart):
+- Bars represent total cumulative work
+- Higher bars = more completed work
+- Compare across activities to identify focus areas
+
+Site Performance (Bar Chart):
+- Side-by-side bars for Target vs Achieved
+- Quick visual comparison across sites
+- Identify best/worst performing sites
+
+TROUBLESHOOTING
+===============
+
+Issue: "No data available for selected period"
+Solution:
+- Verify reports exist in database for that period
+- Check if engineers have submitted reports
+- Try different date range
+
+Issue: Charts not updating
+Solution:
+- Click Refresh button (🔄)
+- Check database connection
+- Verify date range is valid
+
+Issue: Progress showing 0%
+Solution:
+- Confirm Target values are entered (not zero)
+- Verify Achieved values are being recorded
+- Check if activities have data
+
+Issue: Site status shows "No Data"
+Solution:
+- Ensure engineers submit daily reports
+- Check if site code is correct
+- Verify date range includes site activities
+
+INTEGRATION WITH EXCEL EXPORT
+==============================
+
+The dashboard metrics match Excel export exactly:
+
+Dashboard Metric → Excel Column:
+- Target → Target columns per site
+- Achieved → Achieved columns per site
+- Cumulative → Cumulative columns per site
+
+To verify accuracy:
+1. View metrics in dashboard for a period
+2. Export Excel report for same period
+3. Compare values - they should match exactly
+
+PERFORMANCE TIPS
+================
+
+1. Use shorter date ranges for faster loading
+2. Filter to specific sites when analyzing details
+3. Click Refresh only when needed (data updates automatically)
+4. Use Custom Range for specific analysis periods
+5. Close unused browser tabs for better performance
+
+MOBILE ACCESS
+=============
+
+The dashboard is responsive and works on tablets/phones:
+- Use landscape mode for better chart viewing
+- Filters stack vertically on small screens
+- Metrics remain fully functional
+- Excel export works on mobile browsers
+
+SECURITY & PERMISSIONS
+=======================
+
+PM Dashboard requires:
+- Project Manager (PM) role
+- Valid login credentials
+- Access controlled via Supabase RLS
+
+PMs can:
+- View all sites and all reports
+- Generate reports for any site/period
+- Download Excel files
+- View all analytics
+
+PMs cannot:
+- Edit or delete reports (read-only)
+- Create reports (engineers only)
+- Modify site configurations
+
+DATA REFRESH FREQUENCY
+======================
+
+- Metrics update: Real-time (on page load/refresh)
+- Charts update: Real-time (on page load/refresh)
+- Database queries: Fresh data every time
+- No caching of metric calculations
+- Use Refresh button to force update
+
+ANALYTICS FEATURES
+==================
+
+Aggregation Methods:
+
+Daily Totals:
+- Sum of all activities for each day
+- Grouped by date
+- Across all selected sites
+
+Monthly Totals:
+- Sum of all activities for the month
+- Working days calculation
+- Average workers per day
+
+Cumulative Totals:
+- Maximum cumulative value per activity
+- Represents running total from start
+- Updated with each report
+
+Site-wise Totals:
+- Sum across all dates for each site
+- Individual site progress tracking
+- Site comparison metrics
+
+Activity-wise Totals:
+- Sum across all dates for each activity
+- Cross-site activity aggregation
+- Activity performance tracking
+
+EXPORT FORMAT ALIGNMENT
+========================
+
+Dashboard and Excel export are aligned:
+
+Structure Match:
+✓ Same activity names and order
+✓ Same units of measurement
+✓ Same calculation methods
+✓ Same data sources (Supabase)
+✓ Same date filtering logic
+
+This ensures:
+- Dashboard preview matches export
+- No surprises in downloaded files
+- Consistent reporting across formats
+- Accurate management presentations
+
+BEST PRACTICES FOR PROJECT MANAGERS
+====================================
+
+Daily (5 minutes):
+1. Login and check Overall Progress
+2. Review Reports Today metric
+3. Check for red/orange status sites
+4. Quick scan of site-wise metrics
+
+Weekly (15 minutes):
+1. Set period to Last 7 Days
+2. Review trend charts
+3. Generate weekly Excel report
+4. Identify any declining trends
+5. Communicate with underperforming site engineers
+
+Monthly (30 minutes):
+1. Generate monthly summary
+2. Review all site performance
+3. Export monthly DPR report
+4. Analyze activity-wise progress
+5. Prepare management presentation
+6. Set targets for next month
+
+As Needed:
+- Use Activity-wise Analysis for specific investigations
+- Use Custom Range for detailed period analysis
+- Compare multiple sites side-by-side
+- Export historical data for trend analysis
+
+CONTACT & SUPPORT
+=================
+
+For issues or questions:
+1. Verify database connection in .env file
+2. Check if data exists for selected period
+3. Try Refresh button
+4. Review troubleshooting section above
+5. Check Supabase logs for errors
+
+SUCCESS METRICS
+===============
+
+Dashboard is working correctly when:
+✓ Metrics display non-zero values
+✓ Charts render with data
+✓ Color-coded status shows appropriately
+✓ Site-wise cards expand with details
+✓ Filters update displayed data
+✓ Excel export downloads successfully
+✓ Monthly summary calculates correctly
+✓ Refresh button updates metrics
+
+PROJECT HEALTH INDICATORS
+==========================
+
+Healthy Project:
+- Overall Progress: 🟢 ≥70%
+- Most sites: Green or Yellow status
+- Daily trend: Achieved close to Target
+- Reports Today: All sites submitted
+- Cumulative progress: Steady increase
+
+Needs Attention:
+- Overall Progress: 🟡 50-69%
+- Mix of Yellow/Orange sites
+- Daily trend: Achieved below Target
+- Some sites missing reports
+- Cumulative progress: Slow growth
+
+Critical:
+- Overall Progress: 🔴 <50%
+- Multiple Red status sites
+- Daily trend: Large Target-Achieved gap
+- Missing reports frequent
+- Cumulative progress: Stagnant
+
+Take Action:
+1. Review Critical sites immediately
+2. Contact site engineers
+3. Identify blockers and issues
+4. Allocate additional resources
+5. Increase monitoring frequency
+6. Escalate to senior management
+
+=======================================================
+Document Version: 1.0
+Last Updated: November 7, 2025
+For: MAHSR-T3-DPR-App Project Managers
+=======================================================

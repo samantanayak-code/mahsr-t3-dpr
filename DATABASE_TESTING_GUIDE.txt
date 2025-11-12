@@ -1,0 +1,543 @@
+MAHSR-T3-DPR-App - Database Testing Guide
+==========================================
+
+This guide helps verify that all database operations (Create, Read, Update, Delete) work correctly.
+
+DATABASE OVERVIEW
+=================
+
+Technology: Supabase (Cloud PostgreSQL Database)
+Location: Cloud-hosted, accessible via API
+Advantages over SQLite:
+  - Cloud-based (no local file needed)
+  - Built-in authentication and security (RLS)
+  - Real-time capabilities
+  - Automatic backups
+  - Easy to scale for more sites
+
+TABLES STRUCTURE
+================
+
+1. users
+   - id (uuid, primary key)
+   - username (text, unique)
+   - password_hash (text, nullable)
+   - full_name (text)
+   - role (text: 'site_engineer', 'project_manager', 'admin')
+   - site_location (text, nullable - only for site engineers)
+   - email (text, nullable)
+   - is_active (boolean)
+   - created_at (timestamp)
+   - last_login (timestamp)
+
+2. daily_reports
+   - id (uuid, primary key)
+   - report_date (date)
+   - site_code (text)
+   - engineer_id (uuid, foreign key -> users)
+   - weather (text)
+   - total_workers (integer)
+   - remarks (text)
+   - created_at (timestamp)
+   - updated_at (timestamp)
+   - UNIQUE constraint on (report_date, site_code)
+
+3. report_activities
+   - id (uuid, primary key)
+   - report_id (uuid, foreign key -> daily_reports)
+   - activity_name (text)
+   - unit (text)
+   - target (decimal)
+   - achieved (decimal)
+   - cumulative (decimal)
+   - remarks (text)
+
+
+SECTION 1: USER OPERATIONS TESTING
+===================================
+
+Test 1: Create User
+-------------------
+[ ] Open Python console or create test script
+[ ] Import: from utils.database import UserDatabase
+[ ] Create site engineer:
+    result = UserDatabase.create_user(
+        username="test_eng",
+        full_name="Test Engineer",
+        role="site_engineer",
+        site_location="TCB-407"
+    )
+[ ] Verify result['success'] is True
+[ ] Note the user ID returned
+
+Test 2: Read User
+-----------------
+[ ] Get user by ID:
+    user = UserDatabase.get_user_by_id("user_id_here")
+[ ] Verify user data is returned correctly
+[ ] Get user by username:
+    user = UserDatabase.get_user_by_username("test_eng")
+[ ] Verify correct user is returned
+
+Test 3: List All Users
+----------------------
+[ ] Get all users:
+    users = UserDatabase.get_all_users()
+[ ] Verify list contains all 6 demo users plus any test users
+[ ] Get users by role:
+    engineers = UserDatabase.get_all_users(role="site_engineer")
+[ ] Verify only site engineers are returned
+
+Test 4: Get Users by Site
+--------------------------
+[ ] Get engineers at TCB-407:
+    site_users = UserDatabase.get_users_by_site("TCB-407")
+[ ] Verify only TCB-407 engineers are returned
+
+Test 5: Update User
+-------------------
+[ ] Update user email:
+    result = UserDatabase.update_user(
+        "user_id_here",
+        {"email": "newemail@test.com"}
+    )
+[ ] Verify result['success'] is True
+[ ] Read user again and verify email was updated
+
+Test 6: Deactivate User
+-----------------------
+[ ] Deactivate test user:
+    result = UserDatabase.deactivate_user("user_id_here")
+[ ] Verify result['success'] is True
+[ ] Read user and verify is_active is False
+
+
+SECTION 2: REPORT OPERATIONS TESTING
+=====================================
+
+Test 7: Create Report
+---------------------
+[ ] Import: from utils.database import ReportDatabase
+[ ] Import: from datetime import date
+[ ] Create test report:
+    result = ReportDatabase.create_report(
+        report_date=date.today(),
+        site_code="TCB-407",
+        engineer_id="engineer_id_here",
+        weather="Clear",
+        total_workers=25,
+        remarks="Test report"
+    )
+[ ] Verify result['success'] is True
+[ ] Note the report ID returned
+
+Test 8: Read Report by ID
+--------------------------
+[ ] Get report:
+    report = ReportDatabase.get_report_by_id("report_id_here")
+[ ] Verify report data is correct
+[ ] Check all fields match input data
+
+Test 9: Read Report by Date and Site
+-------------------------------------
+[ ] Get report:
+    report = ReportDatabase.get_report_by_date_and_site(
+        date.today(),
+        "TCB-407"
+    )
+[ ] Verify correct report is returned
+
+Test 10: Duplicate Report Prevention
+-------------------------------------
+[ ] Try to create another report for same date/site:
+    result = ReportDatabase.create_report(
+        report_date=date.today(),
+        site_code="TCB-407",
+        engineer_id="engineer_id_here",
+        weather="Cloudy",
+        total_workers=30,
+        remarks="Duplicate test"
+    )
+[ ] Verify result['success'] is False (should fail due to UNIQUE constraint)
+
+Test 11: Get Reports by Site
+-----------------------------
+[ ] Get all reports for TCB-407:
+    reports = ReportDatabase.get_reports_by_site("TCB-407")
+[ ] Verify reports are returned in descending date order
+[ ] Check pagination works with limit parameter
+
+Test 12: Get Reports by Engineer
+---------------------------------
+[ ] Get engineer's reports:
+    reports = ReportDatabase.get_reports_by_engineer("engineer_id_here")
+[ ] Verify only that engineer's reports are returned
+
+Test 13: Get Reports with Date Range
+-------------------------------------
+[ ] Import: from datetime import date, timedelta
+[ ] Set date range:
+    end_date = date.today()
+    start_date = end_date - timedelta(days=30)
+[ ] Get reports:
+    reports = ReportDatabase.get_reports_by_site(
+        "TCB-407",
+        start_date=start_date,
+        end_date=end_date
+    )
+[ ] Verify only reports in date range are returned
+
+Test 14: Update Report
+----------------------
+[ ] Update report:
+    result = ReportDatabase.update_report(
+        "report_id_here",
+        {"total_workers": 35, "weather": "Cloudy"}
+    )
+[ ] Verify result['success'] is True
+[ ] Read report and verify changes
+[ ] Check updated_at timestamp changed
+
+Test 15: Delete Report
+----------------------
+[ ] Delete report:
+    result = ReportDatabase.delete_report("report_id_here")
+[ ] Verify result['success'] is True
+[ ] Try to read deleted report - should return None
+
+
+SECTION 3: ACTIVITY OPERATIONS TESTING
+=======================================
+
+Test 16: Create Activity
+------------------------
+[ ] Import: from utils.database import ActivityDatabase
+[ ] Create activity:
+    result = ActivityDatabase.create_activity(
+        report_id="report_id_here",
+        activity_name="Segment Casting",
+        unit="Nos",
+        target=10.0,
+        achieved=8.0,
+        cumulative=50.0,
+        remarks="Test activity"
+    )
+[ ] Verify result['success'] is True
+[ ] Note activity ID
+
+Test 17: Create Multiple Activities (Bulk)
+-------------------------------------------
+[ ] Create activities list:
+    activities = [
+        {
+            "report_id": "report_id_here",
+            "activity_name": "Segment Curing",
+            "unit": "Nos",
+            "target": 12.0,
+            "achieved": 12.0,
+            "cumulative": 60.0,
+            "remarks": ""
+        },
+        {
+            "report_id": "report_id_here",
+            "activity_name": "Concrete Work",
+            "unit": "Cu.m",
+            "target": 25.5,
+            "achieved": 20.0,
+            "cumulative": 150.0,
+            "remarks": "Delayed by rain"
+        }
+    ]
+[ ] Insert bulk:
+    result = ActivityDatabase.create_activities_bulk(activities)
+[ ] Verify result['success'] is True
+[ ] Verify correct number of activities created
+
+Test 18: Read Activities by Report
+-----------------------------------
+[ ] Get activities:
+    activities = ActivityDatabase.get_activities_by_report("report_id_here")
+[ ] Verify all activities for report are returned
+[ ] Check data matches input
+
+Test 19: Read Single Activity
+------------------------------
+[ ] Get activity:
+    activity = ActivityDatabase.get_activity_by_id("activity_id_here")
+[ ] Verify activity data is correct
+
+Test 20: Update Activity
+------------------------
+[ ] Update activity:
+    result = ActivityDatabase.update_activity(
+        "activity_id_here",
+        {"achieved": 9.0, "remarks": "Updated remarks"}
+    )
+[ ] Verify result['success'] is True
+[ ] Read activity and verify changes
+
+Test 21: Delete Activity
+------------------------
+[ ] Delete activity:
+    result = ActivityDatabase.delete_activity("activity_id_here")
+[ ] Verify result['success'] is True
+[ ] Try to read deleted activity - should return None
+
+Test 22: Delete All Activities for Report
+------------------------------------------
+[ ] Delete all:
+    result = ActivityDatabase.delete_activities_by_report("report_id_here")
+[ ] Verify result['success'] is True
+[ ] Read activities for report - should return empty list
+
+Test 23: Cascade Delete Test
+-----------------------------
+[ ] Create report with activities
+[ ] Delete report:
+    ReportDatabase.delete_report("report_id_here")
+[ ] Try to read activities - should return empty (cascaded delete)
+
+
+SECTION 4: COMPLEX QUERIES TESTING
+===================================
+
+Test 24: Get Complete Report
+-----------------------------
+[ ] Import: from utils.database import ReportQueries
+[ ] Get complete report:
+    complete = ReportQueries.get_complete_report("report_id_here")
+[ ] Verify returns dict with 'report' and 'activities' keys
+[ ] Check all data is present
+
+Test 25: Get Site Summary
+--------------------------
+[ ] Create multiple reports for a site over date range
+[ ] Get summary:
+    summary = ReportQueries.get_site_summary(
+        site_code="TCB-407",
+        start_date=start_date,
+        end_date=end_date
+    )
+[ ] Verify summary contains:
+    - total_reports
+    - total_workers
+    - average_workers
+[ ] Verify calculations are correct
+
+
+SECTION 5: BACKUP & RESTORE TESTING
+====================================
+
+Test 26: Backup All Data
+-------------------------
+[ ] Import: from utils.backup_restore import backup_all_data
+[ ] Create backup:
+    result = backup_all_data(output_dir="./test_backup")
+[ ] Verify result['success'] is True
+[ ] Check backup files exist in ./test_backup directory
+[ ] Verify manifest file contains correct counts
+
+Test 27: Backup Single Site
+----------------------------
+[ ] Import: from utils.backup_restore import backup_site_data
+[ ] Create site backup:
+    result = backup_site_data("TCB-407", output_dir="./test_backup")
+[ ] Verify result['success'] is True
+[ ] Check site backup file exists
+[ ] Verify JSON file contains reports and activities
+
+Test 28: List Backups
+---------------------
+[ ] Import: from utils.backup_restore import list_backups
+[ ] List backups:
+    backups = list_backups(backup_dir="./test_backup")
+[ ] Verify backups are listed in descending order by date
+[ ] Check backup information is complete
+
+Test 29: Export to CSV
+----------------------
+[ ] Import: from utils.backup_restore import export_to_csv
+[ ] Export data:
+    result = export_to_csv(site_code="TCB-407", output_dir="./test_export")
+[ ] Verify result['success'] is True
+[ ] Open CSV file in Excel
+[ ] Verify data is readable and properly formatted
+
+Test 30: Restore from Backup
+-----------------------------
+[ ] Create backup with known data
+[ ] Delete some records from database
+[ ] Import: from utils.backup_restore import restore_from_backup
+[ ] Restore:
+    result = restore_from_backup(
+        backup_dir="./test_backup",
+        manifest_file="path_to_manifest.json"
+    )
+[ ] Verify result['success'] is True
+[ ] Check deleted records are restored
+
+
+SECTION 6: INTEGRATION TESTING VIA APP
+=======================================
+
+Test 31: End-to-End Report Creation
+------------------------------------
+[ ] Login as site engineer
+[ ] Fill out complete DPR form
+[ ] Submit report
+[ ] Verify success message
+[ ] Check database:
+    report = ReportDatabase.get_report_by_date_and_site(date.today(), "TCB-407")
+[ ] Verify report exists
+[ ] Check activities:
+    activities = ActivityDatabase.get_activities_by_report(report['id'])
+[ ] Verify all non-zero activities were saved
+
+Test 32: Report Update via App
+-------------------------------
+[ ] Login as same engineer
+[ ] Try to create report for same date
+[ ] Verify warning appears about existing report
+[ ] Modify values and resubmit
+[ ] Check database to verify update worked
+[ ] Verify updated_at timestamp changed
+
+Test 33: Multi-User Testing
+----------------------------
+[ ] Login as Engineer 1 at TCB-407
+[ ] Create report
+[ ] Logout
+[ ] Login as Engineer 2 at TCB-436
+[ ] Create report
+[ ] Verify each engineer can only see their own reports
+[ ] Login as PM
+[ ] Verify PM can see reports from all sites
+
+
+SECTION 7: PERFORMANCE TESTING
+===============================
+
+Test 34: Large Dataset
+----------------------
+[ ] Create 100+ reports programmatically
+[ ] Test query performance:
+    - Get all reports (should be fast with indexes)
+    - Get reports by site (should use idx_daily_reports_site)
+    - Get reports by date range (should use idx_daily_reports_date)
+[ ] Verify queries complete in < 1 second
+
+Test 35: Concurrent Access
+---------------------------
+[ ] Have multiple users login simultaneously
+[ ] Create reports at the same time
+[ ] Verify no data corruption
+[ ] Check all reports are saved correctly
+
+
+SECTION 8: ERROR HANDLING TESTING
+==================================
+
+Test 36: Invalid Data
+---------------------
+[ ] Try to create user with missing required fields
+[ ] Try to create report with invalid date
+[ ] Try to create activity with negative values
+[ ] Verify appropriate errors are returned
+
+Test 37: Foreign Key Constraints
+---------------------------------
+[ ] Try to create report with non-existent engineer_id
+[ ] Try to create activity with non-existent report_id
+[ ] Verify database rejects invalid references
+
+Test 38: Duplicate Prevention
+------------------------------
+[ ] Try to create duplicate username
+[ ] Try to create duplicate report (same date/site)
+[ ] Verify UNIQUE constraints work
+
+
+SECTION 9: SECURITY TESTING
+============================
+
+Test 39: Row Level Security (RLS)
+----------------------------------
+[ ] Verify engineers can only access their own reports
+[ ] Verify PM/Admin can access all reports
+[ ] Test with different user IDs
+[ ] Verify unauthorized access is blocked
+
+Test 40: SQL Injection Protection
+----------------------------------
+[ ] Try entering SQL commands in form fields
+[ ] Verify Supabase client escapes input properly
+[ ] Check no SQL injection is possible
+
+
+ADDING NEW TCB SITES - VERIFICATION
+====================================
+
+Test 41: Add New Site to Config
+--------------------------------
+[ ] Edit app.py TCB_SITES dictionary
+[ ] Add new site: "TCB-500": "Turbhe Casting Basin - 500"
+[ ] Restart app
+[ ] Verify new site appears in dropdowns
+[ ] Create user for new site
+[ ] Create report for new site
+[ ] Verify everything works without schema changes
+
+Test 42: Multi-Site Reports
+----------------------------
+[ ] Create reports for all sites (407, 436, 469, 486)
+[ ] Query reports by each site
+[ ] Verify site filtering works correctly
+[ ] Generate reports for all sites
+[ ] Verify data segregation is maintained
+
+
+CLEANUP AFTER TESTING
+======================
+
+[ ] Delete all test users created
+[ ] Delete all test reports created
+[ ] Remove test backup files
+[ ] Remove test export files
+[ ] Reset any modified data
+
+
+SUCCESS CRITERIA
+================
+
+All tests pass if:
+✓ All CRUD operations work without errors
+✓ Data integrity is maintained
+✓ Backups and restores work correctly
+✓ Performance is acceptable (< 1 sec for queries)
+✓ Security (RLS) prevents unauthorized access
+✓ App integration works end-to-end
+✓ New sites can be added without code changes
+✓ Excel-like structure is maintained in database
+
+
+TROUBLESHOOTING
+===============
+
+If tests fail, check:
+1. Supabase connection (.env file configured correctly)
+2. Database tables exist (run migrations)
+3. RLS policies are set up correctly
+4. Foreign key constraints are valid
+5. Data types match schema
+
+For help:
+- Review error messages carefully
+- Check Supabase dashboard for detailed logs
+- Verify user has correct permissions
+- Test with service_role key if RLS is blocking
+
+
+==========================================
+Test Date: ___________  Tester: ___________
+All Tests Passed: [ ] Yes  [ ] No
+Issues Found: _____________________________

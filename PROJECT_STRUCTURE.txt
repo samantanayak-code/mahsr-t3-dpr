@@ -1,0 +1,106 @@
+MAHSR-T3-DPR-App - Project Folder Structure
+==============================================
+
+MAHSR-T3-DPR-App/
+│
+├── app.py                          # Main Streamlit application entry point
+│                                   # Contains TCB site config, session management
+│                                   # and main UI layout
+│
+├── requirements.txt                # Python dependencies (streamlit, pandas,
+│                                   # openpyxl, xlsxwriter, supabase, etc.)
+│
+├── .env                            # Environment variables (Supabase credentials)
+│                                   # DO NOT commit to git
+│
+├── .gitignore                      # Git ignore file (excludes .env, __pycache__, etc.)
+│
+├── .streamlit/                     # Streamlit configuration folder
+│   └── config.toml                 # App theme and server settings
+│
+├── components/                     # Reusable UI components
+│   ├── __init__.py                 # Makes this a Python package
+│   ├── data_entry_form.py          # (To be created) Data entry forms
+│   ├── report_viewer.py            # (To be created) Report display components
+│   └── site_selector.py            # (To be created) Site selection UI
+│
+├── utils/                          # Utility functions and helpers
+│   ├── __init__.py                 # Makes this a Python package
+│   ├── excel_generator.py          # (To be created) Excel file generation logic
+│   ├── database.py                 # (To be created) Supabase database operations
+│   └── validators.py               # (To be created) Data validation functions
+│
+├── data/                           # Static data files and configurations
+│   ├── site_config.json            # (Optional) External site configuration
+│   └── template.xlsx               # (Optional) Excel template reference
+│
+├── assets/                         # Static assets
+│   ├── logo.png                    # (Optional) Project/company logo
+│   └── styles.css                  # (Optional) Custom CSS styles
+│
+└── uploads/                        # Temporary uploads folder
+    └── .gitkeep                    # Keeps folder in git (folder contents ignored)
+
+
+KEY FILES EXPLANATION:
+======================
+
+app.py
+------
+- Main entry point for the Streamlit application
+- Contains TCB_SITES configuration dictionary (TCB-407, TCB-436, TCB-469, TCB-486)
+- Session state management for current site and date
+- Three main tabs: Data Entry, Reports, Settings
+- Supabase connection initialization
+
+TO ADD MORE SITES:
+- Edit TCB_SITES dictionary in app.py (lines 36-41)
+- Format: "SITE_CODE": "Site Description"
+- No other code changes needed - app auto-adapts
+
+
+requirements.txt
+----------------
+Core dependencies:
+- streamlit: Web app framework
+- pandas: Data manipulation
+- openpyxl: Excel file reading
+- xlsxwriter: Excel file writing with formatting
+- python-dotenv: Environment variable management
+- supabase: Database connection
+
+
+FOLDER PURPOSES:
+================
+
+/components
+-----------
+Store reusable Streamlit UI components. Each component should be a separate
+Python file with focused functionality (forms, tables, charts, etc.)
+
+/utils
+------
+Backend logic and helper functions. Database operations, Excel generation,
+data validation, and other non-UI code.
+
+/data
+-----
+Static configuration files, reference data, and templates. Files here don't
+change during app execution.
+
+/assets
+-------
+Images, logos, custom CSS, and other static media files used in the UI.
+
+/uploads
+--------
+Temporary storage for user-uploaded files. Contents should be gitignored.
+
+
+DEPLOYMENT READY:
+=================
+This structure is optimized for:
+- Easy maintenance by non-coders
+- Clear separation of concerns
+- Streamlit Cloud deployment
+- Version control with git

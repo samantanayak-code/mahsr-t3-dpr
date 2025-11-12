@@ -1,0 +1,11 @@
+{
+  "name": "mahsr-t3-dpr-app",
+  "version": "1.0.0",
+  "description": "MAHSR T3 Daily Progress Report Application - Python/Streamlit",
+  "scripts": {
+    "build": "echo 'No build required for Python/Streamlit application' && exit 0",
+    "start": "bash start.sh",
+    "dev": "bash start.sh"
+  },
+  "private": true
+}

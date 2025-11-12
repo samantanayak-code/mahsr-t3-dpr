@@ -1,0 +1,81 @@
+MAHSR-T3-DPR-App - Excel Export Quick Start Guide
+=================================================
+
+QUICK START: HOW TO DOWNLOAD DPR EXCEL REPORT
+==============================================
+
+Step 1: Login
+-------------
+Login as Project Manager (PM) user
+
+Step 2: Navigate
+----------------
+Click on "Reports" tab in the PM Dashboard
+
+Step 3: Select Parameters
+--------------------------
+- From Date: Choose start date
+- To Date: Choose end date
+- Select Sites: Choose one or more sites (default: all 4)
+- Export Format: Choose "Excel (.xlsx)"
+
+Step 4: Generate
+----------------
+Click "Generate Report" button
+
+Step 5: Download
+----------------
+Click "Download Excel Report" button when it appears
+
+Step 6: Done!
+-------------
+Your Excel file (DDMMYYYY-DPR.xlsx) is now downloaded
+
+WHAT YOU GET
+============
+
+An Excel file with:
+- Professional formatting (colors, borders, merged cells)
+- Header with report title and date range
+- All 10 activities with Target, Achieved, Cumulative columns
+- Separate columns for each site selected
+- Total row with calculations
+- Remarks section with weather and worker information
+
+FILE FORMAT
+===========
+
+Filename: DDMMYYYY-DPR.xlsx
+Example: 28052025-DPR.xlsx (for May 28, 2025)
+
+The file matches the layout of your reference template exactly.
+
+TIPS
+====
+
+1. For a single day report: Set From Date = To Date
+2. For monthly report: Select first and last day of month
+3. For specific site: Deselect unwanted sites before generating
+4. For all sites: Keep default selection (all 4 sites)
+
+REQUIREMENTS
+============
+
+- Must have data saved in database for selected date range
+- Must select at least one site
+- Start date cannot be after end date
+
+TROUBLESHOOTING
+===============
+
+Problem: No data in Excel
+Solution: Check if reports exist for selected dates/sites
+
+Problem: Download button disabled
+Solution: Ensure at least one site is selected
+
+Problem: Error message
+Solution: Verify date range is valid (start <= end)
+
+For detailed testing instructions, see: EXCEL_EXPORT_TESTING.txt
+For complete documentation, see: EXCEL_EXPORT_README.txt
