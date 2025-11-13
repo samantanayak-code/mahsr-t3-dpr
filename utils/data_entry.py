@@ -112,7 +112,7 @@ def save_daily_report(
 
         existing = supabase.table("daily_reports").select("id").eq(
             "report_date", report_date.isoformat()
-        ).eq("site_code", site_code).maybeSingle().execute()
+        ).eq("site_code", site_code).Single().execute()
 
         report_data = {
             "report_date": report_date.isoformat(),
@@ -186,7 +186,7 @@ def get_report_by_date(site_code: str, report_date: date) -> Optional[Dict]:
 
         result = supabase.table("daily_reports").select("*").eq(
             "site_code", site_code
-        ).eq("report_date", report_date.isoformat()).maybeSingle().execute()
+        ).eq("report_date", report_date.isoformat()).Single().execute()
 
         return result.data
 
@@ -233,7 +233,7 @@ def get_report_with_activities(report_id: str) -> Optional[Dict]:
     try:
         supabase = get_supabase_client()
 
-        report = supabase.table("daily_reports").select("*").eq("id", report_id).maybeSingle().execute()
+        report = supabase.table("daily_reports").select("*").eq("id", report_id).Single().execute()
 
         if not report.data:
             return None
