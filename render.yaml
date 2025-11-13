@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mahsr-t3-dpr
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
+    envVars:
+      - key: SUPABASE_URL
+        value: https://eibmhrjjtdcbydijwmbn.supabase.co
+      - key: SUPABASE_KEY
+        scope: run
+        value: (paste your anon key here)
