@@ -8,6 +8,7 @@ import os
 from utils.auth import authenticate_user, get_user_by_name_and_site, get_supabase_client
 from components.login_page import show_login_page
 from components.reports import show_reports
+from components.progress_dashboard import show_progress_dashboard
 
 # Page configuration
 st.set_page_config(
@@ -23,6 +24,15 @@ if 'authenticated' not in st.session_state:
     st.session_state.user = None
     st.session_state.username = None
     st.session_state.site = None
+    st.session_state.user_role = None
+
+def show_settings():
+    """Settings page"""
+    st.title("⚙️ Settings")
+    st.info("Settings page - Coming soon")
+    
+    with st.expander("User Information"):
+        st.json(st.session_state.user)
 
 def main():
     """Main application logic"""
@@ -47,28 +57,16 @@ def main():
             st.session_state.user = None
             st.session_state.username = None
             st.session_state.site = None
+            st.session_state.user_role = None
             st.rerun()
         
         # Route to different pages based on menu selection
         if menu == "📝 Daily Progress Entry":
+            show_progress_dashboard()
         elif menu == "📊 Reports & Downloads":
             show_reports()
         elif menu == "⚙️ Settings":
             show_settings()
 
-def show_settings():
-    """Settings page"""
-    st.title("⚙️ Settings")
-    st.info("Settings page - Coming soon")
-    
-    with st.expander("User Information"):
-        st.json(st.session_state.user)
-
 if __name__ == "__main__":
     main()
-from components.progress_dashboard import show_progress_dashboard
-# ... in the role routing/menu:
-if st.session_state.user_role == "project_manager":
-    show_progress_dashboard()
-# or call from navigation menu wherever appropriate
-
