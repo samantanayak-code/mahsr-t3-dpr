@@ -53,3 +53,13 @@ def get_user_by_name_and_site(username: str, site: str) -> dict:
     except Exception as e:
         st.error(f"Error fetching user: {str(e)}")
         return None
+def get_current_user():
+    """
+    Retrieve the current logged-in user from Streamlit session state
+    
+    Returns:
+        dict: User information or None if not logged in
+    """
+    if 'user' in st.session_state:
+        return st.session_state.user
+    return None
