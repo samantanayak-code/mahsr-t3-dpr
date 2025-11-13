@@ -1,126 +1,70 @@
-"""
-MAHSR-T3-DPR-App: Daily Progress Report System
-For India's MAHSR (Mumbai–Ahmedabad High Speed Rail) Project
-"""
-
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
-from dotenv import load_dotenv
-from supabase import create_client, Client
+from io import BytesIO
+import os
 
+# Import custom modules
+from utils.auth import authenticate_user, get_user_by_name_and_site, get_supabase_client
 from components.login_page import show_login_page
-from components.engineer_dashboard import show_engineer_dashboard
-from components.pm_dashboard import show_pm_dashboard
-from components.admin_dashboard import show_admin_dashboard
-from utils.auth import logout_user
+from components.progress_entry import show_progress_entry
+from components.reports import show_reports
 
-
-# ------------------------------------------------------------
-# LOAD ENV
-# ------------------------------------------------------------
-load_dotenv()
-
-
-# ------------------------------------------------------------
-# STREAMLIT PAGE CONFIG
-# ------------------------------------------------------------
+# Page configuration
 st.set_page_config(
-    page_title="MAHSR-T3-DPR-App",
+    page_title="MAHSR Daily Progress Tracker",
     page_icon="🚄",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
+# Initialize session state
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.user = None
+    st.session_state.username = None
+    st.session_state.site = None
 
-# ------------------------------------------------------------
-# INIT SUPABASE CLIENT
-# ------------------------------------------------------------
-@st.cache_resource
-def init_supabase() -> Client:
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_ANON_KEY")
-    return create_client(url, key)
-
-
-supabase = init_supabase()
-
-
-# ------------------------------------------------------------
-# SESSION DEFAULTS
-# ------------------------------------------------------------
-defaults = {
-    "logged_in": False,
-    "user_role": None,
-    "username": None,
-    "user_id": None,
-    "site_code": None
-}
-for key, value in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
-
-
-# ------------------------------------------------------------
-# ROLE-BASED ROUTING (Fixed to match Supabase)
-#
-# Supabase roles:
-#   "Admin" → show_admin_dashboard()
-#   "Administrator" → show_pm_dashboard()
-#   "admin" → show_engineer_dashboard()
-# ------------------------------------------------------------
-def show_authenticated_app():
-    """Show appropriate dashboard based on authenticated user's role."""
-
-    # ---- SIDEBAR ----
-    with st.sidebar:
-        st.header("User Info")
-        st.write(f"**Name:** {st.session_state.username}")
-        st.write(f"**Role:** {st.session_state.user_role}")
-
-        if st.session_state.site_code:
-            st.write(f"**Site:** {st.session_state.site_code}")
-
-        st.divider()
-
-        if st.button("🚪 Logout", use_container_width=True):
-            logout_user()
-            st.rerun()
-
-        st.caption(f"Session started at: {datetime.now().strftime('%H:%M:%S')}")
-
-    # ---- DASHBOARD ROUTING ----
-    role = st.session_state.user_role
-
-    if role == "Admin":
-        show_admin_dashboard()
-
-    elif role == "Administrator":
-        show_pm_dashboard()
-
-    elif role == "admin":
-        show_engineer_dashboard()
-
-    else:
-        st.error(f"Unknown role '{role}'. Contact Admin.")
-        logout_user()
-        st.rerun()
-
-    st.divider()
-    st.caption("MAHSR-T3-DPR-App | Mumbai–Ahmedabad High Speed Rail Project")
-
-
-# ------------------------------------------------------------
-# MAIN
-# ------------------------------------------------------------
 def main():
-    """Primary application router."""
-    if not st.session_state.logged_in:
+    """Main application logic"""
+    
+    # Show login page if not authenticated
+    if not st.session_state.authenticated:
         show_login_page()
     else:
-        show_authenticated_app()
+        # Show main application
+        st.sidebar.title(f"Welcome, {st.session_state.username}")
+        st.sidebar.write(f"**Site:** {st.session_state.site}")
+        
+        # Navigation menu
+        menu = st.sidebar.radio(
+            "Navigation",
+            ["📝 Daily Progress Entry", "📊 Reports & Downloads", "⚙️ Settings"]
+        )
+        
+        # Logout button
+        if st.sidebar.button("🚪 Logout", type="primary"):
+            st.session_state.authenticated = False
+            st.session_state.user = None
+            st.session_state.username = None
+            st.session_state.site = None
+            st.rerun()
+        
+        # Route to different pages based on menu selection
+        if menu == "📝 Daily Progress Entry":
+            show_progress_entry()
+        elif menu == "📊 Reports & Downloads":
+            show_reports()
+        elif menu == "⚙️ Settings":
+            show_settings()
 
+def show_settings():
+    """Settings page"""
+    st.title("⚙️ Settings")
+    st.info("Settings page - Coming soon")
+    
+    with st.expander("User Information"):
+        st.json(st.session_state.user)
 
 if __name__ == "__main__":
     main()
