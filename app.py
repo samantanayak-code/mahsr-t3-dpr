@@ -68,4 +68,5 @@ def show_settings():
 
 if __name__ == "__main__":
     main()
+from components.progress_entry import show_progress_entry
 
