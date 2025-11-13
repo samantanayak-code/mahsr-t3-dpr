@@ -7,7 +7,6 @@ import os
 # Import custom modules
 from utils.auth import authenticate_user, get_user_by_name_and_site, get_supabase_client
 from components.login_page import show_login_page
-from components.progress_entry import show_progress_entry
 from components.reports import show_reports
 
 # Page configuration
