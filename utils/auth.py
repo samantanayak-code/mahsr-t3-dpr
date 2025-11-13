@@ -111,7 +111,7 @@ def get_user_by_id(user_id: str) -> dict:
 
         response = supabase.table("users").select("*").eq(
             "id", user_id
-        ).maybeSingle().execute()
+        ).Single().execute()
 
         return response.data
 
