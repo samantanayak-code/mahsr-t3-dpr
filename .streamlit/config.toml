@@ -1,22 +1,15 @@
 [server]
-headless = true
-enableCORS = false
+port = 8501
 enableXsrfProtection = false
-port = $PORT
+enableCORS = false
+headless = true
 
 [browser]
 gatherUsageStats = false
 
 [theme]
-base = "dark"
-primaryColor = "#0095f6"
-secondaryBackgroundColor = "#101820"
-textColor = "#ffffff"
-font = "sans serif"
-# -----------------------------------------------------------------
-# 3. Start Streamlit app
-# -----------------------------------------------------------------
-echo "🌐 Launching MAHSR-T3-DPR app..."
-echo "⏳ Waiting for environment to settle..."
-sleep 3
-streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.enableXsrfProtection=false --server.enableCORS=false
+primaryColor = "#4B9CD3"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
+
