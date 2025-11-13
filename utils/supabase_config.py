@@ -27,9 +27,3 @@ def get_supabase():
         st.session_state.supabase = initialize_supabase()
     return st.session_state.supabase
 
-
-def get_supabase():
-    """Get or initialize Supabase client"""
-    if 'supabase' not in st.session_state:
-        st.session_state.supabase = initialize_supabase()
-    return st.session_state.supabase
