@@ -51,7 +51,6 @@ def main():
         
         # Route to different pages based on menu selection
         if menu == "📝 Daily Progress Entry":
-            show_progress_entry()
         elif menu == "📊 Reports & Downloads":
             show_reports()
         elif menu == "⚙️ Settings":
