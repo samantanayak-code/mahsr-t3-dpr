@@ -54,7 +54,7 @@ def show_login_page():
 
 
 # -----------------------------------------------------------
-# SITE ENGINEER LOGIN
+# SITE ENGINEER LOGIN (NAME + SITE)
 # -----------------------------------------------------------
 
 def _show_engineer_login():
@@ -87,7 +87,7 @@ def _show_engineer_login():
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
-            st.session_state.user_role = user["role"]     # "admin"
+            st.session_state.user_role = user["role"]     # this will be "admin"
             st.session_state.site_code = user["site_location"]
 
             st.success(f"Welcome, {user['full_name']}!")
@@ -115,9 +115,10 @@ def _show_pm_login():
             st.error("Please enter both username and password.")
             return
 
-        user = authenticate_user(username.strip(), password, user_type="project_manager")
+        # NEW → No user_type argument
+        user = authenticate_user(username.strip(), password)
 
-        if user:
+        if user and user.get("role") == "Administrator":
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
@@ -149,9 +150,10 @@ def _show_admin_login():
             st.error("Please provide both username and password.")
             return
 
-        user = authenticate_user(username.strip(), password, user_type="admin")
+        # NEW → No user_type argument
+        user = authenticate_user(username.strip(), password)
 
-        if user:
+        if user and user.get("role") == "Admin":
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
@@ -186,3 +188,4 @@ def _show_demo_credentials():
         - Username: `admin`  
         - Password: `admin123`
         """)
+
