@@ -5,4 +5,9 @@ enableCORS = false
 
 [browser]
 gatherUsageStats = false
+import streamlit as st
+
+def show_progress_entry():
+    st.header("Progress Entry")
+    st.info("Progress entry module is under development.")
 
