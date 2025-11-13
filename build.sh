@@ -22,3 +22,4 @@ pip install -r requirements.txt
 # -----------------------------------------------------------------
 echo "🌐 Launching MAHSR-T3-DPR app..."
 streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.enableXsrfProtection=false --server.enableCORS=false
+
