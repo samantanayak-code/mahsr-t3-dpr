@@ -1,59 +1,55 @@
-from passlib.hash import bcrypt
-from supabase import create_client
+import streamlit as st
+from supabase import create_client, Client
 import os
 
-# Initialize Supabase
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_ANON_KEY")
-)
+# Get Supabase credentials from environment variables
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-def authenticate_user(username: str, password: str):
-    """Authenticate ANY user."""
+def get_supabase_client() -> Client:
+    """
+    Initialize and return Supabase client
+    Fixed version - removes 'proxy' parameter that causes TypeError
+    """
     try:
-        response = (
-            supabase.table("users")
-            .select("*")
-            .eq("username", username)
-            .maybe_single()
-        )
-
-        if not response or "password_hash" not in response:
-            return None
-
-        stored_hash = response["password_hash"]
-
-        # Passlib password verification
-        if stored_hash and bcrypt.verify(password, stored_hash):
-            return response
-
-        return None
-
+        # CORRECT: Only pass url and key parameters
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        return supabase
     except Exception as e:
-        print("AUTH ERROR:", e)
-        return None
+        st.error(f"Error connecting to Supabase: {str(e)}")
+        raise
 
-
-def get_user_by_name_and_site(full_name: str, site_code: str):
-    """Authenticate Site Engineer (name + site)."""
+def authenticate_user(username: str, password: str) -> dict:
+    """
+    Authenticate user against Supabase database
+    """
     try:
-        return (
-            supabase.table("users")
-            .select("*")
-            .eq("full_name", full_name)
-            .eq("site_location", site_code)
-            .maybe_single()
-        )
+        supabase = get_supabase_client()
+        
+        # Query users table
+        response = supabase.table('users').select('*').eq('username', username).eq('password', password).execute()
+        
+        if response.data and len(response.data) > 0:
+            return {"success": True, "user": response.data[0]}
+        else:
+            return {"success": False, "message": "Invalid credentials"}
+            
     except Exception as e:
-        print("ENGINEER LOGIN ERROR:", e)
+        return {"success": False, "message": f"Authentication error: {str(e)}"}
+
+def get_user_by_name_and_site(username: str, site: str) -> dict:
+    """
+    Get user by username and site
+    """
+    try:
+        supabase = get_supabase_client()
+        
+        response = supabase.table('users').select('*').eq('username', username).eq('site', site).execute()
+        
+        if response.data and len(response.data) > 0:
+            return response.data[0]
         return None
-
-
-def logout_user():
-    """Reset session state."""
-    import streamlit as st
-    st.session_state.logged_in = False
-    st.session_state.user_id = None
-    st.session_state.username = None
-    st.session_state.user_role = None
-    st.session_state.site_code = None
+            
+    except Exception as e:
+        st.error(f"Error fetching user: {str(e)}")
+        return None
