@@ -6,39 +6,43 @@ def initialize_supabase():
     try:
         import supabase
         
-        # Get credentials from environment variables (Render sets these)
+        # Get credentials from environment - Render sets these
         url = os.getenv("SUPABASE_URL")
         key = os.getenv("SUPABASE_KEY")
         
         if not url or not key:
-            raise ValueError(f"Missing credentials: URL={url}, KEY={'set' if key else 'missing'}")
+            st.error(f"❌ Missing Supabase credentials")
+            st.info(f"URL: {'✓ Set' if url else '✗ Missing'}")
+            st.info(f"KEY: {'✓ Set' if key else '✗ Missing'}")
+            return None
         
         client = supabase.create_client(url, key)
         return client
     
     except Exception as e:
-        st.error(f"❌ Supabase Error: {str(e)}")
+        st.error(f"❌ Supabase init error: {str(e)}")
         return None
 
 def authenticate_user(username: str, password: str):
-    """Authenticate user"""
+    """Authenticate user against database"""
     try:
         client = initialize_supabase()
         if not client:
             return False, "Supabase not initialized"
         
-        # Query users table
+        # Query database
         response = client.table('users').select('*').eq('username', username).execute()
         
-        if not response.data:
+        if not response.data or len(response.data) == 0:
             return False, "User not found"
         
-        user = response.data[0]
+        user = response.data[0]  # Get first result
         
-        # Check password (plaintext for demo - use bcrypt in production!)
-        if user['password'] != password:
+        # Check password
+        if user.get('password') != password:
             return False, "Invalid password"
         
+        # Return success with user data
         return True, user
     
     except Exception as e:
@@ -60,4 +64,5 @@ def get_user_by_name_and_site(username: str, site_code: str):
 def get_supabase_client():
     """Get initialized Supabase client"""
     return initialize_supabase()
+
 
