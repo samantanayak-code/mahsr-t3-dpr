@@ -8,26 +8,35 @@ supabase = create_client(
     os.getenv("SUPABASE_ANON_KEY")
 )
 
+
+# =======================================================
+# UNIVERSAL AUTHENTICATION (Admin + PM)
+# =======================================================
 def authenticate_user(username: str, password: str):
     """
-    Authenticate ANY user.
-    Role-based routing is handled in app.py.
+    Authenticate ANY user by username + password.
+    Role-based routing happens inside app.py
     """
     try:
         response = (
             supabase.table("users")
             .select("*")
             .eq("username", username)
-            .maybe_single()
+            .single()
+            .execute()
         )
 
-        if not response or "password_hash" not in response:
+        if not response.data:
             return None
 
-        stored_hash = response["password_hash"]
+        user = response.data
+        stored_hash = user.get("password_hash")
 
-        if stored_hash and bcrypt.checkpw(password.encode(), stored_hash.encode()):
-            return response
+        if not stored_hash:
+            return None
+
+        if bcrypt.checkpw(password.encode(), stored_hash.encode()):
+            return user
 
         return None
 
@@ -36,23 +45,35 @@ def authenticate_user(username: str, password: str):
         return None
 
 
+# =======================================================
+# AUTH FOR SITE ENGINEERS (name + site)
+# =======================================================
 def get_user_by_name_and_site(full_name: str, site_code: str):
-    """Authenticate Site Engineer (name + site)"""
+    """
+    Authenticate Site Engineer by full name + assigned site.
+    """
     try:
         response = (
             supabase.table("users")
             .select("*")
             .eq("full_name", full_name)
             .eq("site_location", site_code)
-            .maybe_single()
+            .single()
+            .execute()
         )
-        return response
-    except:
+
+        return response.data
+
+    except Exception as e:
+        print("ENGINEER AUTH ERROR:", e)
         return None
 
 
+# =======================================================
+# LOGOUT HANDLER
+# =======================================================
 def logout_user():
-    """Reset session state"""
+    """Clear Streamlit session state completely"""
     import streamlit as st
     st.session_state.logged_in = False
     st.session_state.user_id = None
