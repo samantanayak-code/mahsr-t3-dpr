@@ -1,15 +1,14 @@
 """
 Login Page Component for MAHSR-T3-DPR-App
-Handles authentication for three user roles:
-
-- Site Engineer → login by name + site
-- Project Manager → username + password
-- Admin → username + password
+End-to-end authenticated login flow for:
+- Site Engineer (name + site)
+- Project Manager (username + password)
+- Admin (username + password)
 
 Supabase Role Mapping:
-- "Admin" → Admin Dashboard
-- "Administrator" → Project Manager Dashboard
-- "admin" → Site Engineer Dashboard
+- Admin → Admin Dashboard
+- Administrator → PM Dashboard
+- admin → Site Engineer Dashboard
 """
 
 import streamlit as st
@@ -22,7 +21,7 @@ from utils.auth import authenticate_user, get_user_by_name_and_site
 
 def show_login_page():
     """Display the main login page with role selection."""
-    
+
     st.title("🚄 MAHSR-T3-DPR-App")
     st.subheader("Daily Progress Report System")
     st.divider()
@@ -84,10 +83,11 @@ def _show_engineer_login():
         user = get_user_by_name_and_site(name.strip(), site)
 
         if user and user.get("is_active"):
+            # Force correct role
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
-            st.session_state.user_role = user["role"]     # this will be "admin"
+            st.session_state.user_role = "site_engineer"
             st.session_state.site_code = user["site_location"]
 
             st.success(f"Welcome, {user['full_name']}!")
@@ -115,14 +115,14 @@ def _show_pm_login():
             st.error("Please enter both username and password.")
             return
 
-        # NEW → No user_type argument
         user = authenticate_user(username.strip(), password)
 
+        # Ensure the user is truly PM
         if user and user.get("role") == "Administrator":
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
-            st.session_state.user_role = user["role"]   # "Administrator"
+            st.session_state.user_role = "project_manager"
             st.session_state.site_code = None
 
             st.success(f"Welcome, {user['full_name']}!")
@@ -150,14 +150,13 @@ def _show_admin_login():
             st.error("Please provide both username and password.")
             return
 
-        # NEW → No user_type argument
         user = authenticate_user(username.strip(), password)
 
         if user and user.get("role") == "Admin":
             st.session_state.logged_in = True
             st.session_state.user_id = user["id"]
             st.session_state.username = user["full_name"]
-            st.session_state.user_role = user["role"]  # "Admin"
+            st.session_state.user_role = "admin"
             st.session_state.site_code = None
 
             st.success(f"Welcome, {user['full_name']}!")
@@ -188,4 +187,3 @@ def _show_demo_credentials():
         - Username: `admin`  
         - Password: `admin123`
         """)
-
