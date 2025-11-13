@@ -1,65 +1,63 @@
 import streamlit as st
-from supabase import create_client, Client
 import os
 
-# Get Supabase credentials from environment variables
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-def get_supabase_client() -> Client:
-    """
-    Initialize and return Supabase client
-    Fixed version - removes 'proxy' parameter that causes TypeError
-    """
+def initialize_supabase():
+    """Initialize Supabase client from environment variables"""
     try:
-        # CORRECT: Only pass url and key parameters
-        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        return supabase
+        import supabase
+        
+        # Get credentials from environment variables (Render sets these)
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        
+        if not url or not key:
+            raise ValueError(f"Missing credentials: URL={url}, KEY={'set' if key else 'missing'}")
+        
+        client = supabase.create_client(url, key)
+        return client
+    
     except Exception as e:
-        st.error(f"Error connecting to Supabase: {str(e)}")
-        raise
+        st.error(f"❌ Supabase Error: {str(e)}")
+        return None
 
-def authenticate_user(username: str, password: str) -> dict:
-    """
-    Authenticate user against Supabase database
-    """
+def authenticate_user(username: str, password: str):
+    """Authenticate user"""
     try:
-        supabase = get_supabase_client()
+        client = initialize_supabase()
+        if not client:
+            return False, "Supabase not initialized"
         
         # Query users table
-        response = supabase.table('users').select('*').eq('username', username).eq('password', password).execute()
+        response = client.table('users').select('*').eq('username', username).execute()
         
-        if response.data and len(response.data) > 0:
-            return {"success": True, "user": response.data[0]}
-        else:
-            return {"success": False, "message": "Invalid credentials"}
-            
-    except Exception as e:
-        return {"success": False, "message": f"Authentication error: {str(e)}"}
-
-def get_user_by_name_and_site(username: str, site: str) -> dict:
-    """
-    Get user by username and site
-    """
-    try:
-        supabase = get_supabase_client()
+        if not response.data:
+            return False, "User not found"
         
-        response = supabase.table('users').select('*').eq('username', username).eq('site', site).execute()
+        user = response.data[0]
         
-        if response.data and len(response.data) > 0:
-            return response.data[0]
-        return None
-            
-    except Exception as e:
-        st.error(f"Error fetching user: {str(e)}")
-        return None
-def get_current_user():
-    """
-    Retrieve the current logged-in user from Streamlit session state
+        # Check password (plaintext for demo - use bcrypt in production!)
+        if user['password'] != password:
+            return False, "Invalid password"
+        
+        return True, user
     
-    Returns:
-        dict: User information or None if not logged in
-    """
-    if 'user' in st.session_state:
-        return st.session_state.user
-    return None
+    except Exception as e:
+        return False, f"Auth error: {str(e)}"
+
+def get_user_by_name_and_site(username: str, site_code: str):
+    """Get user by username and site"""
+    try:
+        client = initialize_supabase()
+        if not client:
+            return None
+        
+        response = client.table('users').select('*').eq('username', username).eq('site_code', site_code).execute()
+        return response.data[0] if response.data else None
+    
+    except Exception as e:
+        return None
+
+def get_supabase_client():
+    """Get initialized Supabase client"""
+    return initialize_supabase()
+
