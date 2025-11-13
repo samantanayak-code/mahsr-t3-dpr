@@ -1,41 +1,26 @@
-# -------------------------
-# CORE FRAMEWORKS
-# -------------------------
+# ---- Core Frameworks ----
 streamlit==1.31.0
 pandas==2.3.3
 python-dotenv==1.0.1
 
-# -------------------------
-# EXCEL & DATA HANDLING
-# -------------------------
+# ---- Excel & Data Handling ----
 openpyxl==3.1.5
 xlsxwriter==3.2.9
 
-# -------------------------
-# SUPABASE (v2 CLIENT ONLY)
-# -------------------------
+# ---- Supabase Client (v2) ----
 supabase==2.4.0
 
-# -------------------------
-# AUTH / PASSWORD HASHING
-# (passlib replaces bcrypt)
-# -------------------------
+# ---- Authentication ----
 passlib[bcrypt]==1.7.4
-argon2-cffi==23.1.0
 
-# -------------------------
-# UTILITIES
-# -------------------------
+# ---- Utilities ----
 requests==2.32.3
 Pillow==10.4.0
 plotly==5.24.1
 
-# -------------------------
-# STREAMLIT ADD-ONS
-# -------------------------
+# ---- Streamlit Add-ons ----
 streamlit-option-menu==0.3.12
 
-# -------------------------
-# INTERNAL TOOLS
-# -------------------------
+# ---- Internal Tools ----
 watchdog==4.0.1
+
