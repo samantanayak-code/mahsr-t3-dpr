@@ -10,7 +10,7 @@ xlsxwriter==3.2.9
 # ---- Supabase Client (v2) ----
 supabase==2.4.0
 
-# ---- Authentication ----
+# ---- Authentication (bcrypt via passlib) ----
 passlib[bcrypt]==1.7.4
 
 # ---- Utilities ----
