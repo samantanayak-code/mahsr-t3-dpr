@@ -7,9 +7,9 @@ python-dotenv==1.0.1
 openpyxl==3.1.5
 xlsxwriter==3.2.9
 
-# ---- Supabase Integration (New SDK + Required sub-libraries) ----
+# ---- Supabase Integration (Correct Versions) ----
 supabase==2.4.0
-gotrue==2.4.0
+gotrue==2.4.4
 postgrest==0.16.1
 realtime==1.0.2
 storage3==0.5.3
@@ -24,4 +24,6 @@ streamlit-option-menu==0.3.12
 
 # ---- Internal Tools ----
 watchdog==4.0.1
+
+
 
