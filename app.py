@@ -1,6 +1,6 @@
 """
-MAHSR-T3-DPR-App: Daily Progress Report Generator
-For India's MAHSR (Mumbai-Ahmedabad High Speed Rail) Project
+MAHSR-T3-DPR-App: Daily Progress Report System
+For India's MAHSR (Mumbai–Ahmedabad High Speed Rail) Project
 """
 
 import streamlit as st
@@ -15,20 +15,17 @@ from components.engineer_dashboard import show_engineer_dashboard
 from components.pm_dashboard import show_pm_dashboard
 from components.admin_dashboard import show_admin_dashboard
 from utils.auth import logout_user
-import sys
 
-# Force Streamlit to reload static assets cleanly
-if getattr(sys, 'frozen', False):
-    st.warning("Running as a frozen app — skipping cache reload.")
-else:
-    import shutil
-    static_dir = os.path.join(os.path.expanduser("~"), ".streamlit", "static")
-    if os.path.exists(static_dir):
-        shutil.rmtree(static_dir, ignore_errors=True)
 
+# ------------------------------------------------------------
+# LOAD ENV
+# ------------------------------------------------------------
 load_dotenv()
 
-st.set_option("client.displayEnabled", True)
+
+# ------------------------------------------------------------
+# STREAMLIT PAGE CONFIG
+# ------------------------------------------------------------
 st.set_page_config(
     page_title="MAHSR-T3-DPR-App",
     page_icon="🚄",
@@ -36,75 +33,94 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
+# ------------------------------------------------------------
+# INIT SUPABASE CLIENT
+# ------------------------------------------------------------
 @st.cache_resource
 def init_supabase() -> Client:
-    """Initialize Supabase client for data persistence"""
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_ANON_KEY")
     return create_client(url, key)
 
+
 supabase = init_supabase()
 
-TCB_SITES = {
-    "TCB-407": "Turbhe Casting Basin - 407",
-    "TCB-436": "Turbhe Casting Basin - 436",
-    "TCB-469": "Turbhe Casting Basin - 469",
-    "TCB-486": "Turbhe Casting Basin - 486"
+
+# ------------------------------------------------------------
+# SESSION DEFAULTS
+# ------------------------------------------------------------
+defaults = {
+    "logged_in": False,
+    "user_role": None,
+    "username": None,
+    "user_id": None,
+    "site_code": None
 }
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
 
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
 
-if 'user_role' not in st.session_state:
-    st.session_state.user_role = None
-
-if 'username' not in st.session_state:
-    st.session_state.username = None
-
-if 'site_code' not in st.session_state:
-    st.session_state.site_code = None
-
+# ------------------------------------------------------------
+# ROLE-BASED ROUTING (Fixed to match Supabase)
+#
+# Supabase roles:
+#   "Admin" → show_admin_dashboard()
+#   "Administrator" → show_pm_dashboard()
+#   "admin" → show_engineer_dashboard()
+# ------------------------------------------------------------
 def show_authenticated_app():
-    """Display appropriate dashboard based on user role with logout in sidebar"""
+    """Show appropriate dashboard based on authenticated user's role."""
 
+    # ---- SIDEBAR ----
     with st.sidebar:
         st.header("User Info")
         st.write(f"**Name:** {st.session_state.username}")
-        st.write(f"**Role:** {st.session_state.user_role.replace('_', ' ').title()}")
+        st.write(f"**Role:** {st.session_state.user_role}")
 
         if st.session_state.site_code:
             st.write(f"**Site:** {st.session_state.site_code}")
 
         st.divider()
 
-        if st.button("🚪 Logout", type="secondary", use_container_width=True):
+        if st.button("🚪 Logout", use_container_width=True):
             logout_user()
             st.rerun()
 
-        st.divider()
-        st.caption(f"Session started: {datetime.now().strftime('%H:%M:%S')}")
+        st.caption(f"Session started at: {datetime.now().strftime('%H:%M:%S')}")
 
-    if st.session_state.user_role == 'site_engineer':
-        show_engineer_dashboard()
-    elif st.session_state.user_role == 'project_manager':
-        show_pm_dashboard()
-    elif st.session_state.user_role == 'admin':
+    # ---- DASHBOARD ROUTING ----
+    role = st.session_state.user_role
+
+    if role == "Admin":
         show_admin_dashboard()
+
+    elif role == "Administrator":
+        show_pm_dashboard()
+
+    elif role == "admin":
+        show_engineer_dashboard()
+
     else:
-        st.error("Invalid user role")
+        st.error(f"Unknown role '{role}'. Contact Admin.")
         logout_user()
         st.rerun()
 
     st.divider()
-    st.caption("MAHSR-T3-DPR-App | Mumbai-Ahmedabad High Speed Rail Project")
+    st.caption("MAHSR-T3-DPR-App | Mumbai–Ahmedabad High Speed Rail Project")
 
+
+# ------------------------------------------------------------
+# MAIN
+# ------------------------------------------------------------
 def main():
-    """Main application entry point with authentication routing"""
-
+    """Primary application router."""
     if not st.session_state.logged_in:
         show_login_page()
     else:
         show_authenticated_app()
+
 
 if __name__ == "__main__":
     main()
