@@ -66,7 +66,6 @@ def show_settings():
 
 if __name__ == "__main__":
     main()
-from components.progress_entry import show_progress_entry
 from components.progress_dashboard import show_progress_dashboard
 # ... in the role routing/menu:
 if st.session_state.user_role == "project_manager":
