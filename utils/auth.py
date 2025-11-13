@@ -34,7 +34,7 @@ def authenticate_user(username: str, password: str, expected_role: str) -> dict:
 
         response = supabase.table("users").select("*").eq(
             "username", username
-        ).eq("role", expected_role).eq("is_active", True).maybeSingle().execute()
+        ).eq("role", expected_role).eq("is_active", True).Single().execute()
 
         if response.data and response.data.get('password_hash') == password:
             update_last_login(response.data['id'])
@@ -65,7 +65,7 @@ def get_user_by_name_and_site(name: str, site_code: str) -> dict:
             "full_name", name
         ).eq("site_location", site_code).eq(
             "role", "site_engineer"
-        ).eq("is_active", True).maybeSingle().execute()
+        ).eq("is_active", True).Single().execute()
 
         if response.data:
             update_last_login(response.data['id'])
