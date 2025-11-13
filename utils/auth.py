@@ -9,10 +9,7 @@ supabase = create_client(
 )
 
 def authenticate_user(username: str, password: str):
-    """
-    Authenticate ANY user.
-    Role-based routing is handled in login_page and app.py.
-    """
+    """Authenticate ANY user."""
     try:
         response = (
             supabase.table("users")
@@ -26,7 +23,7 @@ def authenticate_user(username: str, password: str):
 
         stored_hash = response["password_hash"]
 
-        # Passlib bcrypt verification
+        # Passlib password verification
         if stored_hash and bcrypt.verify(password, stored_hash):
             return response
 
@@ -40,20 +37,20 @@ def authenticate_user(username: str, password: str):
 def get_user_by_name_and_site(full_name: str, site_code: str):
     """Authenticate Site Engineer (name + site)."""
     try:
-        response = (
+        return (
             supabase.table("users")
             .select("*")
             .eq("full_name", full_name)
             .eq("site_location", site_code)
             .maybe_single()
         )
-        return response
-    except Exception:
+    except Exception as e:
+        print("ENGINEER LOGIN ERROR:", e)
         return None
 
 
 def logout_user():
-    """Reset session state"""
+    """Reset session state."""
     import streamlit as st
     st.session_state.logged_in = False
     st.session_state.user_id = None
