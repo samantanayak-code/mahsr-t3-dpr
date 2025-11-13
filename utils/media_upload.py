@@ -359,3 +359,35 @@ def process_and_upload_media(supabase, uploaded_file, report_id: str, activity_n
     size_str = format_file_size(len(file_bytes))
     compression_note = " (compressed)" if compressed else ""
     return True, f"File uploaded successfully: {size_str}{compression_note}"
+def upload_image_to_storage(image_file, bucket_name, file_path):
+    """
+    Upload an image file to cloud storage (Supabase Storage)
+    
+    Args:
+        image_file: The image file object from Streamlit file uploader
+        bucket_name: Name of the storage bucket in Supabase
+        file_path: Path where the file should be stored
+    
+    Returns:
+        URL of the uploaded file or None if upload fails
+    """
+    try:
+        import supabase
+        
+        # Initialize Supabase client
+        supabase_url = st.secrets["supabase_url"]
+        supabase_key = st.secrets["supabase_key"]
+        client = supabase.create_client(supabase_url, supabase_key)
+        
+        # Upload file
+        response = client.storage.from_(bucket_name).upload(
+            path=file_path,
+            file=image_file
+        )
+        
+        # Return public URL
+        return client.storage.from_(bucket_name).get_public_url(file_path)
+    
+    except Exception as e:
+        st.error(f"Upload failed: {str(e)}")
+        return None
