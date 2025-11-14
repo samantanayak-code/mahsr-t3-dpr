@@ -11,4 +11,4 @@ services:
         value: https://eibmhrjjtdcbydijwmbn.supabase.co
       - key: SUPABASE_KEY
         scope: run
-        value: (paste your anon key here)
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpYm1ocmpqdGRjYnlkamp3bWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0OTA0OTUsImV4cCI6MjA3ODA2NjQ5NX0.9B5d0sbHnFVbRd61NH-nP5KFokfNGsNvroUXYu7Wxps
