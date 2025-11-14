@@ -1,68 +1,61 @@
+from supabase import create_client
 import streamlit as st
-import os
 
 def initialize_supabase():
-    """Initialize Supabase client from environment variables"""
+    """Initialize Supabase client using Streamlit secrets (for Streamlit Cloud)"""
     try:
-        import supabase
-        
-        # Get credentials from environment - Render sets these
-        url = os.getenv("SUPABASE_URL")
-        key = os.getenv("SUPABASE_KEY")
-        
+        url = st.secrets.get("SUPABASE_URL", None)
+        key = st.secrets.get("SUPABASE_KEY", None)
+
         if not url or not key:
-            st.error(f"❌ Missing Supabase credentials")
+            st.error("❌ Missing Supabase credentials. Please check your secrets.")
             st.info(f"URL: {'✓ Set' if url else '✗ Missing'}")
             st.info(f"KEY: {'✓ Set' if key else '✗ Missing'}")
             return None
-        
-        client = supabase.create_client(url, key)
+
+        client = create_client(url, key)
         return client
-    
+
     except Exception as e:
         st.error(f"❌ Supabase init error: {str(e)}")
         return None
 
 def authenticate_user(username: str, password: str):
-    """Authenticate user against database"""
+    """Authenticate user against Supabase database"""
     try:
         client = initialize_supabase()
         if not client:
             return False, "Supabase not initialized"
         
-        # Query database
         response = client.table('users').select('*').eq('username', username).execute()
         
         if not response.data or len(response.data) == 0:
             return False, "User not found"
         
-        user = response.data[0]  # Get first result
+        user = response.data[0]
         
-        # Check password
+        # Plaintext password check (replace with hashed password in production!)
         if user.get('password') != password:
             return False, "Invalid password"
-        
-        # Return success with user data
+
         return True, user
-    
+
     except Exception as e:
         return False, f"Auth error: {str(e)}"
 
 def get_user_by_name_and_site(username: str, site_code: str):
-    """Get user by username and site"""
+    """Get user by username and site_code"""
     try:
         client = initialize_supabase()
         if not client:
             return None
-        
+
         response = client.table('users').select('*').eq('username', username).eq('site_code', site_code).execute()
         return response.data[0] if response.data else None
-    
+
     except Exception as e:
         return None
 
 def get_supabase_client():
-    """Get initialized Supabase client"""
+    """Get initialized Supabase client for other usage"""
     return initialize_supabase()
-
-
