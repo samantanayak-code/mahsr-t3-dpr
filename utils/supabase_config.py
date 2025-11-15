@@ -6,8 +6,8 @@ def initialize_supabase():
     """Initialize Supabase client"""
     try:
         # Try to get from Streamlit secrets first, then from environment
-        url = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
-        key = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
+        url = st.secrets.get("SUPABASE_URL")
+        key = st.secrets.get("SUPABASE_KEY")
         
         if not url or not key:
             st.error("❌ Supabase credentials not configured")
