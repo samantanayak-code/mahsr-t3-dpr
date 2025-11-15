@@ -4,6 +4,9 @@ from datetime import datetime
 from io import BytesIO
 import os
 
+st.write("Secrets keys available:", list(st.secrets.keys()))
+st.write("SUPABASE_KEY value present?", bool(st.secrets.get("SUPABASE_KEY")))
+
 # Import custom modules
 from utils.auth import authenticate_user, get_user_by_name_and_site, get_supabase_client
 from components.login_page import show_login_page
