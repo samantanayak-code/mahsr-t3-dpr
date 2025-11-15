@@ -1,24 +1,16 @@
 from supabase import create_client
 import streamlit as st
 
+from supabase import create_client
+import streamlit as st
+
 def initialize_supabase():
-    """Initialize Supabase client using Streamlit secrets (for Streamlit Cloud)"""
-    try:
-        url = st.secrets.get("SUPABASE_URL", None)
-        key = st.secrets.get("SUPABASE_KEY", None)
-
-        if not url or not key:
-            st.error("❌ Missing Supabase credentials. Please check your secrets.")
-            st.info(f"URL: {'✓ Set' if url else '✗ Missing'}")
-            st.info(f"KEY: {'✓ Set' if key else '✗ Missing'}")
-            return None
-
-        client = create_client(url, key)
-        return client
-
-    except Exception as e:
-        st.error(f"❌ Supabase init error: {str(e)}")
+    url = st.secrets.get("SUPABASE_URL")
+    key = st.secrets.get("SUPABASE_KEY")
+    if not url or not key:
+        st.error("❌ Enter SUPABASE_URL and SUPABASE_KEY as secrets in Streamlit Cloud (ALL UPPERCASE).")
         return None
+    return create_client(url, key)
 
 def authenticate_user(username: str, password: str):
     """Authenticate user against Supabase database"""
